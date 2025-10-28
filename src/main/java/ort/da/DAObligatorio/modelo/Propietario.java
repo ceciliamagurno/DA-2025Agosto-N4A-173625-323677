@@ -10,15 +10,15 @@ public class Propietario {
     private String nombreCompleto;
     private List<Vehiculo> vehiculos;  
     private List<Bonificacion> bonificaciones;
-    private List<Estado> estados;
+    private Estado estado;
 
-    public Propietario(String cedula, String password, String nombreCompleto, ArrayList<Vehiculo> vehiculos) {
+    public Propietario(String cedula, String password, String nombreCompleto, ArrayList<Vehiculo> vehiculos, Estado estado) {
         this.cedula = cedula;
         this.password = password;
         this.nombreCompleto = nombreCompleto;
         this.vehiculos = new ArrayList<>();
         this.bonificaciones = new ArrayList<>();
-        this.estados = new ArrayList<>();
+        this.estado = estado;
     }
 
     public String getNombreCompleto() {
@@ -33,8 +33,8 @@ public class Propietario {
         return bonificaciones;
     }
 
-    public List<Estado> getEstados() {
-        return estados;
+    public Estado getEstados() {
+        return estado;
     }
 
     public String getCedula() {
