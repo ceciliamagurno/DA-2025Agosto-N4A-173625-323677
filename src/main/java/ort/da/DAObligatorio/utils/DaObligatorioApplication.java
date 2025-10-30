@@ -1,6 +1,5 @@
-package ort.da.DAObligatorio;
+package ort.da.DAObligatorio.utils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.springframework.boot.SpringApplication;
@@ -10,7 +9,7 @@ import ort.da.DAObligatorio.modelo.*;
 import ort.da.DAObligatorio.excepciones.PeajeException;
 import ort.da.DAObligatorio.Servicios.Fachada.Fachada;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "ort.da.DAObligatorio")
 public class DaObligatorioApplication {
 
 	public static void main(String[] args) {
@@ -24,8 +23,8 @@ public class DaObligatorioApplication {
 
 
 
-		Administrador admin1 = new Administrador("12345678", "admin.123", "Usuario Administrador");
-        Administrador admin2 = new Administrador("ad2", "pass2", "Admin Dos");
+		Administrador admin1 = new Administrador("12345678", "admin.123", "Usuario Administrador", null, null);
+        Administrador admin2 = new Administrador("ad2", "pass2", "Admin Dos", null, null);
         f.agregarAdministrador(admin1);
         f.agregarAdministrador(admin2);
 
@@ -75,9 +74,8 @@ public class DaObligatorioApplication {
         f.agregarBonificacion(frecuentes);
         f.agregarBonificacion(trabajadores);
 	
-		Vehiculo v1 = new Vehiculo("ABC123", "ModeloX", "Rojo", null); // reemplazar null por la categoría correspondiente
-        Vehiculo v2 = new Vehiculo("DEF456", "ModeloY", "Azul", null);
-
+		Vehiculo v1 = new Vehiculo("ABC123", "ModeloX", "Rojo", catAuto);
+        Vehiculo v2 = new Vehiculo("DEF456", "ModeloY", "Azul", catCamion);
 
 		Propietario prop1 = new Propietario(
 								"23456789", 
@@ -86,7 +84,7 @@ public class DaObligatorioApplication {
 								2000.0, 
 								500.0,
 								Arrays.asList(v1),
-								null
+								habilitado
 		);
         Propietario prop2 = new Propietario(
 								"p2", 
@@ -95,7 +93,7 @@ public class DaObligatorioApplication {
 								1000.0, 
 								200.0, 
 								Arrays.asList(v2),
-								null);
+								habilitado);
 
         try {
             f.agregarPropietario(prop1);

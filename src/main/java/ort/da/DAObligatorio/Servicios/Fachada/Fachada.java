@@ -2,7 +2,6 @@ package ort.da.DAObligatorio.Servicios.Fachada;
 
 import ort.da.DAObligatorio.modelo.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class Fachada {
 
     private Fachada() {
         // Inicialización de servicios y datos
-        sUsuarios = new ServicioUsuarios();
+        this.sUsuarios = new ServicioUsuarios();
         this.puestos = new ArrayList<>();
         this.categorias = new ArrayList<>();
         this.tarifas = new ArrayList<>();
@@ -39,6 +38,8 @@ public class Fachada {
         return instancia;
     }
 
+
+
     public void agregarPropietario(Propietario propietario) throws PeajeException {
         sUsuarios.agregarPropietario(propietario);
     }
@@ -51,6 +52,7 @@ public class Fachada {
         return sUsuarios.buscarPropietarioPorMatricula(matricula);
     }
 
+    
     //UTILES PARA LA PRECARGA DE DATOS DESPUES PASASR A LOS SERVICIOS CORRESPONDIENTES
     public void agregarPuesto(Puesto p) { if (p != null) puestos.add(p); }
     public void agregarCategoriaVehiculo(CategoriaVehiculo c) { if (c != null) categorias.add(c); }
@@ -74,6 +76,34 @@ public class Fachada {
             }
         }
         return null;
+    }
+
+    public Usuario autenticar(String cedula, String contrasenia) {
+        return sUsuarios.autenticar(cedula, contrasenia);
+    }
+
+    public Propietario buscarPropietarioPorCedua(String cedula) {
+        return sUsuarios.buscarPropietarioPorCedua(cedula);
+    }
+
+    public void asignarBonificacionPropietarios(String cedula, Bonificacion b) throws PeajeException {
+        sUsuarios.asignarBonificacionPropietarios(cedula, b);
+    }
+
+    public void cambiarEstadoPropietario(String cedula, Estado e) throws PeajeException {
+        sUsuarios.cambiarEstadoPropietario(cedula, e);
+    }
+
+    public Administrador buscarAdministradorCedula(String cedula) {
+        return sUsuarios.buscarAdministradorCedula(cedula);
+    }
+
+    public List<Propietario> getPropietarios() {
+        return sUsuarios.listaPropietarios();
+    }
+
+    public List<Administrador> getAdministradores() {
+        return sUsuarios.getAdministradores();
     }
 
 

@@ -3,55 +3,49 @@ package ort.da.DAObligatorio.modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Propietario {
+public class Propietario extends Usuario {
     
-    private String cedula;
-    private String password;
-    private String nombreCompleto;
+    
     private double saldoActual;
-    private double saldoMininoAlerta;
+    private double saldoMinimoAlerta;
     private List<Vehiculo> vehiculos;  
     private List<Bonificacion> bonificaciones;
     private Estado estado;
 
     //un constructor con lista de vehiculos y estado
-    public Propietario(String cedula, String password, String nombreCompleto, 
-                            double saldoActual, 
-                            double saldoMinimoAlerta, 
-                            List<Vehiculo> vehiculos, 
-                            Estado estado) {
-        this.cedula = cedula;
-        this.password = password;
-        this.nombreCompleto = nombreCompleto;
-        this.saldoActual = saldoActual;
-        this.saldoMininoAlerta = saldoMinimoAlerta;
+    public Propietario(String cedula, 
+                        String contrasenia,     
+                        String nombreCompleto, 
+                        double saldoActual, 
+                        double saldoMinimoAlerta, 
+                        List<Vehiculo> vehiculos, 
+                        Estado estado) {
+        super(cedula, contrasenia, nombreCompleto);
+                this.saldoActual = saldoActual;
+        this.saldoMinimoAlerta = saldoMinimoAlerta;
         this.vehiculos = (vehiculos == null) ? new ArrayList<>() : new ArrayList<>(vehiculos);
         this.bonificaciones = new ArrayList<>();
         this.estado = estado;
     }
     
     //otro constructor sin lista de vehiculos y estado
-    public Propietario(String cedula, String password, 
-                            String nombreCompleto, 
-                            double saldoActual, 
-                            double saldoMinimoAlerta) {
-        this.cedula = cedula;
-        this.password = password;
-        this.nombreCompleto = nombreCompleto;
+    public Propietario(String cedula, 
+                        String contrasenia,     
+                        String nombreCompleto, 
+                        double saldoActual, 
+                        double saldoMinimoAlerta) {
+        super(cedula, contrasenia, nombreCompleto);
         this.saldoActual = saldoActual;
-        this.saldoMininoAlerta = saldoMinimoAlerta; 
+        this.saldoMinimoAlerta = saldoMinimoAlerta; 
         this.vehiculos = new ArrayList<>();
         this.bonificaciones = new ArrayList<>();
         this.estado = null;
     }
 
 
-    public String getCedula() {
-        return cedula;
-    }
 
     public String getNombreCompleto() {
-        return nombreCompleto;
+        return super.toString();
     }
 
     public double getSaldoActual() {
@@ -59,7 +53,7 @@ public class Propietario {
     }
 
     public double getSaldoMininoAlerta() {
-        return saldoMininoAlerta;
+        return saldoMinimoAlerta;
     }   
 
     public List<Vehiculo> getVehiculos() {
@@ -82,6 +76,9 @@ public class Propietario {
         this.bonificaciones.add(bonificacion);
     }
 
+    public Estado getEstado() {
+        return estado;
+    }
     public void setEstado(Estado estado) {
         this.estado = estado;
     }
@@ -111,6 +108,11 @@ public class Propietario {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean coincideCedula(String cedula) {
+        return  super.coincideCedula(cedula); 
     }
 
 

@@ -1,33 +1,31 @@
 package ort.da.DAObligatorio.modelo;
 
-public class Administrador {
-    private String cedula;
-    private String password;
-    private String nombreCompleto;
+import java.util.Date;
 
-    public Administrador(String cedula, String password, String nombreCompleto) {
-        this.cedula = cedula;
-        this.password = password;
-        this.nombreCompleto = nombreCompleto;
-    }
+public class Administrador extends Usuario {
 
-    public String getCedula() {
-        return cedula;
-    }
-
-
-
-    public String getPassword() {
-        return password;
-    }
-
-
-    public String getNombreCompleto() {
-        return nombreCompleto;
-    }
-
-
-
+    private Date fechaIngreso;
+    private Date fechaSalida;
     
+    public Administrador(String cedula, 
+                        String contrasenia, 
+                        String nombreCompleto,
+                        Date fechaIngreso,
+                        Date fechaSalida) {
+        super(cedula, contrasenia, nombreCompleto);
+        this.fechaIngreso = fechaIngreso;
+        this.fechaSalida = fechaSalida;
+    }
 
+    @Override
+    public boolean coincideCedula(String cedula) {
+        return super.coincideCedula(cedula);
+    }
+
+    public Date getFechaIngreso() {
+        return fechaIngreso;
+    }
+    public Date getFechaSalida() {
+        return fechaSalida;
+    }
 }
