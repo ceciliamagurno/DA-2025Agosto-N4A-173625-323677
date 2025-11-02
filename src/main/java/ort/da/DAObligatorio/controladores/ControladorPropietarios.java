@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
-import ort.da.DAObligatorio.Servicios.Fachada.Fachada;
 import ort.da.DAObligatorio.dtos.PropietarioDto;
 import ort.da.DAObligatorio.modelo.Propietario;
 import ort.da.DAObligatorio.modelo.Usuario;
+import ort.da.DAObligatorio.servicios.fachada.Fachada;
 import ort.da.DAObligatorio.utils.Respuesta;
 
 @RestController
@@ -46,8 +46,6 @@ public class ControladorPropietarios {
         }
         return new Respuesta("propietarios", propietariosDto);
     }
-
-
 
     
 }

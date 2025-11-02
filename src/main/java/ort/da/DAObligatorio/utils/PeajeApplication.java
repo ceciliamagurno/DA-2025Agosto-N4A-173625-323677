@@ -6,14 +6,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import ort.da.DAObligatorio.modelo.*;
+import ort.da.DAObligatorio.servicios.fachada.Fachada;
 import ort.da.DAObligatorio.excepciones.PeajeException;
-import ort.da.DAObligatorio.Servicios.Fachada.Fachada;
 
 @SpringBootApplication(scanBasePackages = "ort.da.DAObligatorio")
-public class DaObligatorioApplication {
+public class PeajeApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DaObligatorioApplication.class, args);
+		SpringApplication.run(PeajeApplication.class, args);
 
 		cargarDatosDePrueba();
 	}

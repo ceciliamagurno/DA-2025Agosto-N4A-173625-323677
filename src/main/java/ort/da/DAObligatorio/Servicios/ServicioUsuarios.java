@@ -1,4 +1,4 @@
-package ort.da.DAObligatorio.Servicios;
+package ort.da.DAObligatorio.servicios;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +17,11 @@ public class ServicioUsuarios {
     //poner lista de sesiones si hace falta, crear la clase etc etc
 
     public ServicioUsuarios() {
-        // Inicializar listas y otros atributos si es necesario
         this.propietarios = new ArrayList<>();
         this.administradores = new ArrayList<>();
     }
 
-    public Usuario autenticar(String cedula, String contrasenia) {
+    public Usuario login(String cedula, String contrasenia) {
         // Buscar en propietarios
         for (Propietario p : propietarios) {
             if (p.coincideCedula(cedula) && p.verificarContrasenia(contrasenia)) {
@@ -63,7 +62,7 @@ public class ServicioUsuarios {
         return null; // Retorna null si no se encuentra ningún propietario con esa matrícula
     }
     
-    public Propietario buscarPropietarioPorCedua(String cedula){
+    public Propietario buscarPropietarioPorCedula(String cedula){
         if(cedula == null || cedula.isEmpty()) return null;
 
         for(Propietario p : propietarios){
@@ -75,7 +74,7 @@ public class ServicioUsuarios {
     }
     
     public void asignarBonificacionPropietarios(String cedula, Bonificacion b) throws PeajeException {
-        Propietario p = buscarPropietarioPorCedua(cedula);
+        Propietario p = buscarPropietarioPorCedula(cedula);
         if(p != null && b !=null){
             p.agregarBonificacion(b);
         } else {
@@ -84,7 +83,7 @@ public class ServicioUsuarios {
     }
 
     public void cambiarEstadoPropietario(String cedula, Estado e) throws PeajeException {
-        Propietario p = buscarPropietarioPorCedua(cedula);
+        Propietario p = buscarPropietarioPorCedula(cedula);
         if(p != null && e !=null){
             p.setEstado(e);
         } else {

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Administrador</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card" style="max-width:480px;margin:3rem auto;text-align:center;">
+            <h1 class="brand">Login - Administrador</h1>
+            <p class="menu-desc">Acceso de administradores</p>
+
+            <form id="formLogin" onsubmit="event.preventDefault(); enviarLogin();" style="display:flex;flex-direction:column;gap:0.6rem;align-items:stretch;">
+                <input type="text" id="cedula" name="cedula" placeholder="Cédula" required style="padding:0.6rem;border:1px solid #e6e9ef;border-radius:6px;" />
+                <input type="password" id="contrasenia" name="contrasenia" placeholder="Contraseña" required style="padding:0.6rem;border:1px solid #e6e9ef;border-radius:6px;" />
+
+                <button type="submit" class="btn">Ingresar</button>
+            </form>
+
+            <p style="margin-top:1rem;"><a class="btn ghost" href="index.html">Volver</a></p>
+        </div>
+    </div>
+
+    <script src="utilesVista.js"></script>
+    <script src="vistaWeb.js"></script>
+    <script>
+        function enviarLogin(){
+            const data = serializarFormulario('formLogin');
+            submit('/login/login', data, 'POST');
+        }
+
+        function mostrar_loginExitoso(parametro){
+            window.location.href = parametro;
+        }
+
+        function excepcionDeAplicacion(mensaje){
+            alert('Error: ' + mensaje);
+        }
+    </script>
+</body>
+</html>

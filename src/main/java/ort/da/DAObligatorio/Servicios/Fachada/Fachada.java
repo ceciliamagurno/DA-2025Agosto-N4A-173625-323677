@@ -1,11 +1,12 @@
-package ort.da.DAObligatorio.Servicios.Fachada;
+package ort.da.DAObligatorio.servicios.fachada;
 
 import ort.da.DAObligatorio.modelo.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ort.da.DAObligatorio.Servicios.ServicioUsuarios;
+import ort.da.DAObligatorio.servicios.ServicioUsuarios;
+import ort.da.DAObligatorio.controladores.ControladorLogin;
 import ort.da.DAObligatorio.excepciones.PeajeException;
 
 public class Fachada {
@@ -78,12 +79,12 @@ public class Fachada {
         return null;
     }
 
-    public Usuario autenticar(String cedula, String contrasenia) {
-        return sUsuarios.autenticar(cedula, contrasenia);
+    public Usuario login(String cedula, String contrasenia) {
+        return sUsuarios.login(cedula, contrasenia);
     }
 
-    public Propietario buscarPropietarioPorCedua(String cedula) {
-        return sUsuarios.buscarPropietarioPorCedua(cedula);
+    public Propietario buscarPropietarioPorCedula(String cedula) {
+        return sUsuarios.buscarPropietarioPorCedula(cedula);
     }
 
     public void asignarBonificacionPropietarios(String cedula, Bonificacion b) throws PeajeException {
@@ -104,6 +105,11 @@ public class Fachada {
 
     public List<Administrador> getAdministradores() {
         return sUsuarios.getAdministradores();
+    }
+
+    public ControladorLogin getServicioUsuarios() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getServicioUsuarios'");
     }
 
 

@@ -1,7 +1,4 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Other/javascript.js to edit this template
- */
+
 // La página que incluya esta lib debe (opcionalmente) cargar estas variables 
 var urlIniciarVista = null;
 var parametrosInicioVista = "";
