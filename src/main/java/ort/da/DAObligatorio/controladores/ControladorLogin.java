@@ -18,7 +18,7 @@ import ort.da.DAObligatorio.modelo.Propietario;
 @RestController
 @RequestMapping("/login")
 public class ControladorLogin {
-    @PostMapping({"", "/login"})
+    @PostMapping("/login")
     public List<Respuesta> login(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String contrasenia) throws PeajeException {
 
         Usuario usuarioLogueado  = Fachada.getInstancia().login(cedula, contrasenia);

@@ -21,6 +21,10 @@ public abstract class Usuario {
         return cedula.equals(this.cedula);
     }
 
+    public String getCedula() {
+        return cedula;
+    }
+
     @Override
     public String toString() {
         return nombreCompleto;

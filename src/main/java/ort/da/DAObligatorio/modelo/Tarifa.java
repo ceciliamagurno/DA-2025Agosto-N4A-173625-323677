@@ -27,4 +27,25 @@ public class Tarifa {
     public List<CategoriaVehiculo> getCategoriasVehiculos() {
         return categoriasVehiculos;
     }
+
+public void agregarPuesto(Puesto p){
+        if(puestos.contains(p) || p == null) return;
+        puestos.add(p);
+    }
+
+    public void agregarCategoriaVehiculo(CategoriaVehiculo cv){
+        if(categoriasVehiculos.contains(cv) || cv == null) return;
+        categoriasVehiculos.add(cv);
+    }
+
+    public boolean tienePuesto(Puesto p){
+        return puestos.contains(p);
+    }
+
+    public boolean tieneCategoriaVehiculo(CategoriaVehiculo cv){
+        return categoriasVehiculos.contains(cv);
+    }
+
+
+
 }

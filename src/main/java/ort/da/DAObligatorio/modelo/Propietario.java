@@ -42,7 +42,9 @@ public class Propietario extends Usuario {
         this.estado = null;
     }
 
-
+    public String getCedula() {
+        return super.getCedula();
+    }
 
     public String getNombreCompleto() {
         return super.toString();
@@ -83,9 +85,9 @@ public class Propietario extends Usuario {
         this.estado = estado;
     }
 
-    public void setEstado(String descripcion) {
-        this.estado = new Estado(descripcion);
-    }
+    // public void setEstado(String nombre) {
+    //     this.estado = new Estado(nombre);
+    // } no se puede hacer mas porque es abstracto quizas usar factory?
 
     public boolean descontar(double monto) {
         if(monto <= 0) return false;
