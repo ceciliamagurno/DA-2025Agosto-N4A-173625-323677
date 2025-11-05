@@ -24,12 +24,12 @@ public class ControladorPropietarios {
 
 
     @GetMapping("/vistaConectada")
-    public List<Respuesta> inicializarVista(@SessionAttribute(name = "UsuarioConectado", required = false) Usuario usuarioConectado) {
+    public List<Respuesta> inicializarVista(@SessionAttribute(name = "UsuarioConectado", required = false) Usuario UsuarioConectado) {
         
-        if (usuarioConectado ==null) {
+        if (UsuarioConectado ==null) {
             return Respuesta.lista(propietariosRespuesta());
         } 
-        if(usuarioConectado instanceof Propietario) {
+        if(UsuarioConectado instanceof Propietario) {
             return Respuesta.lista(propietariosRespuesta());
         }
         return Respuesta.lista(mensaje( "usuario no es propietario"));

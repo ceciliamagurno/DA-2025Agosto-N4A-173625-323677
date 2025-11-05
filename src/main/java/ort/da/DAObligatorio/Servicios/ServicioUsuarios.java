@@ -2,6 +2,7 @@ package ort.da.DAObligatorio.servicios;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import ort.da.DAObligatorio.excepciones.PeajeException;
 import ort.da.DAObligatorio.modelo.Administrador;
@@ -12,28 +13,23 @@ import ort.da.DAObligatorio.modelo.Usuario;
 import ort.da.DAObligatorio.modelo.Vehiculo;
 
 public class ServicioUsuarios {
-    private List<Propietario> propietarios;
-    private List<Administrador> administradores;
+    private List<Usuario> usuarios;
     //poner lista de sesiones si hace falta, crear la clase etc etc
 
     public ServicioUsuarios() {
-        this.propietarios = new ArrayList<>();
-        this.administradores = new ArrayList<>();
+        this.usuarios = new ArrayList<>();
     }
 
+
+    //buscamos en todos los usuarios
     public Usuario login(String cedula, String contrasenia) {
-        // Buscar en propietarios
-        for (Propietario p : propietarios) {
-            if (p.coincideCedula(cedula) && p.verificarContrasenia(contrasenia)) {
-                return p;
+        if(cedula == null) return null;
+        for (Usuario u : usuarios) {
+            if (u.coincideCedula(cedula) && u.verificarContrasenia(contrasenia)) {
+                return u;
             }
         }
-        // Buscar en administradores
-        for (Administrador a : administradores) {
-            if (a.coincideCedula(cedula) && a.verificarContrasenia(contrasenia)) {
-                return a;
-            }
-        }
+        
         return null; 
     }
 
@@ -42,22 +38,31 @@ public class ServicioUsuarios {
     public void agregarPropietario(Propietario propietario) throws PeajeException{
         if(propietario == null) return;
         //VALIDAMOS QUE LA MATRICULA NO EXISTA YA 
-        for(Vehiculo v : propietario.getVehiculos()){
-            if(buscarPropietarioPorMatricula(v.getMatricula()) != null) { 
-                throw new PeajeException("Ya existe un propietario con un vehiculo de la misma matricula: " + v.getMatricula());
+        for(Usuario u : usuarios){
+            if(u instanceof Propietario){//cambiar estas partes del codigo para que apliquen experto u.esPropietario() metodo que devuelve  u instanceof Propietario aca y en todos los metodos similares
+                Propietario p = (Propietario) u;
+                for(Vehiculo vehiculiExistente : p.getVehiculos()){
+                    String matriculaExistente = vehiculiExistente.getMatricula();
+                    if(matriculaExistente == null) continue;
+                    if(propietario.tieneVehiculoConMatricula(matriculaExistente)){
+                        throw new PeajeException("Ya existe un vehiculo con la misma matricula: " + matriculaExistente);
+                    }
+                }
             }
         }
-        propietarios.add(propietario);
+        
+        usuarios.add(propietario);
     }
 
     public Propietario buscarPropietarioPorMatricula(String matricula) {
-        if(matricula == null || matricula.isEmpty()) {
-            return null;
-        }
-        for (Propietario p : propietarios) {
-            if(p.tieneVehiculoConMatricula(matricula)){
-                return p;
-            }
+        if(matricula == null || matricula.isEmpty()) return null;
+        
+        for (Usuario u : usuarios) {
+            if(u instanceof Propietario){
+                Propietario p = (Propietario) u;
+                if(p.tieneVehiculoConMatricula(matricula)) return p;
+            
+            } 
         }
         return null; // Retorna null si no se encuentra ningún propietario con esa matrícula
     }
@@ -65,9 +70,11 @@ public class ServicioUsuarios {
     public Propietario buscarPropietarioPorCedula(String cedula){
         if(cedula == null || cedula.isEmpty()) return null;
 
-        for(Propietario p : propietarios){
-            if(p.coincideCedula(cedula)){
-                return p;
+         for (Usuario u : usuarios) {
+            if(u instanceof Propietario){
+                Propietario p = (Propietario) u;
+                 if(p.coincideCedula(cedula)) return p;
+
             }
         }
         return null;
@@ -98,26 +105,33 @@ public class ServicioUsuarios {
     //COSAS PARA ADMINISTRADORES
     public void agregarAdministrador(Administrador administrador) {
         if(administrador == null) return;
-        administradores.add(administrador);
+        usuarios.add(administrador);
     }
 
     public Administrador buscarAdministradorCedula(String cedula) {
         if(cedula == null || cedula.isEmpty())   return null;
         
-        for (Administrador a : administradores) {
-            if (a.coincideCedula(cedula)) {
-                return a;
+        for (Usuario u : usuarios) {
+            if (u instanceof Administrador) {
+                Administrador a = (Administrador) u;
+                if (a.coincideCedula(cedula)) return a;
             }
         }
         return null; 
     }
 
     public List<Propietario> listaPropietarios() {
-        return new ArrayList<>(propietarios);
+        return usuarios.stream()
+                .filter(u -> u instanceof Propietario)
+                .map(u -> (Propietario) u)
+                .collect(Collectors.toList());
     }
 
-    public List<Administrador> getAdministradores() {
-        return administradores;
+    public List<Administrador> listaAdministradores() {
+        return usuarios.stream()
+                .filter(u -> u instanceof Administrador)
+                .map(u -> (Administrador) u)
+                .collect(Collectors.toList());
     }
 
    

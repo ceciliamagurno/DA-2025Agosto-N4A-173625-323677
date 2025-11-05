@@ -20,14 +20,23 @@ import ort.da.DAObligatorio.modelo.Propietario;
 public class ControladorLogin {
     @PostMapping("/login")
     public List<Respuesta> login(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String contrasenia) throws PeajeException {
-
+        // Intentamos autenticar el usuario
         Usuario usuarioLogueado  = Fachada.getInstancia().login(cedula, contrasenia);
         if (usuarioLogueado == null) {
-            throw new PeajeException("Cédula o contraseña inválida");
+            throw new PeajeException("Acceso denegado");
         }
-        sesionHttp.setAttribute("usuario", usuarioLogueado);
 
-        // Redirigir según tipo de usuario
+        //verificamos si el propietario esta deshabilitado para curso alternativo
+        if(usuarioLogueado instanceof Propietario){
+            Propietario p = (Propietario) usuarioLogueado;
+            if(p.getEstado() == null || !p.getEstado().permiteTransito()){
+                throw new PeajeException("Usuario deshabilitado, no puede ingresar al sistema");
+            }
+        }
+
+        sesionHttp.setAttribute("UsuarioConectado", usuarioLogueado);
+
+        // Redirigimos según tipo de usuario
         if (usuarioLogueado instanceof Administrador) {
             return Respuesta.lista(new Respuesta("loginExitoso", "admin.html"));
         } else if (usuarioLogueado instanceof Propietario) {

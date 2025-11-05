@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -12,5 +12,173 @@
         <p>Bienvenido. Aquí irán las funcionalidades para el propietario.</p>
             <p><a href="index.html">Cerrar sesión / Volver al inicio</a></p>
     </div>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tablero - Propietario</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Pequeños ajustes para adaptar la apariencia al CSS existente */
+    .top-row { display:flex;justify-content:space-between;align-items:center;margin:1rem 0;gap:12px; }
+    .logo-box{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#7c3aed);box-shadow:0 6px 18px rgba(11,22,39,0.06);}
+    .title { font-size:1.15rem;font-weight:700; }
+    .right-actions { text-align:right; color:var(--muted); }
+    .grid-layout { display:grid; grid-template-columns: 1fr 320px; gap:1rem; align-items:start; }
+    @media (max-width:960px){ .grid-layout{grid-template-columns:1fr} }
+    .resumen-row{display:flex;gap:12px;margin-bottom:12px}
+    .res-box{flex:1;padding:12px;border-radius:8px;background:var(--card);border:1px solid rgba(15,23,42,0.03)}
+    .panel-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    table.small{width:100%;border-collapse:collapse;font-size:14px}
+    table.small th, table.small td{padding:8px 10px;text-align:left;border-bottom:1px solid #eef2ff}
+    .badge {display:inline-block;padding:6px 10px;border-radius:999px;background:#fbfbff;color:var(--muted);font-weight:600;font-size:12px;border:1px solid #eef2ff}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-row">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="logo-box" aria-hidden="true"></div>
+        <div>
+          <div class="title">Tablero de control del propietario</div>
+          <div class="menu-desc">Resumen y actividad</div>
+        </div>
+      </div>
+      <div class="right-actions">
+        <div>Bienvenido, <strong id="nombreMini">Propietario</strong></div>
+        <div style="margin-top:6px"><a href="index.html" class="btn ghost">Salir</a></div>
+      </div>
+    </div>
+
+    <div class="grid-layout">
+      <!-- columna principal -->
+      <main>
+        <div class="card">
+          <div class="resumen-row">
+            <div class="res-box">
+              <div class="small-muted">NOMBRE COMPLETO</div>
+              <div id="nombreProp" style="margin-top:6px;font-weight:700">Juan Pérez</div>
+            </div>
+            <div class="res-box">
+              <div class="small-muted">ESTADO</div>
+              <div id="estadoProp" style="margin-top:6px;font-weight:700">Activo</div>
+            </div>
+            <div class="res-box">
+              <div class="small-muted">SALDO ACTUAL</div>
+              <div id="saldoProp" style="margin-top:6px;font-weight:700">$ 2.540,00</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div style="flex:1;min-width:260px" class="card">
+              <div class="panel-title">
+                <strong>Bonificaciones asignadas</strong>
+                <span class="small-muted">Resumen</span>
+              </div>
+              <table class="small">
+                <thead>
+                  <tr><th>Bonificación</th><th>Puesto</th><th>Fecha</th></tr>
+                </thead>
+                <tbody id="bonificacionesBody">
+                  <tr><td>Frecuente</td><td>Peaje Norte</td><td>2025-01-10</td></tr>
+                  <tr><td>Trabajador</td><td>Peaje Centro</td><td>2025-03-02</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="width:320px" class="card">
+              <div class="panel-title">
+                <strong>Vehículos registrados</strong>
+                <span class="small-muted">Matrículas</span>
+              </div>
+              <table class="small">
+                <thead>
+                  <tr><th>Matrícula</th><th>Modelo</th><th>Color</th></tr>
+                </thead>
+                <tbody id="vehiculosBody">
+                  <tr><td>SAB1234</td><td>Sedán</td><td>Azul</td></tr>
+                  <tr><td>SCD5678</td><td>SUV</td><td>Gris</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="transitos" style="margin-top:16px">
+            <div class="panel-title">
+              <strong>Tránsitos realizados</strong>
+              <div class="small-muted">Últimos</div>
+            </div>
+            <div style="overflow:auto">
+              <table>
+                <thead>
+                  <tr><th>Puesto</th><th>Matrícula</th><th>Categoría</th><th>Monto tarifa</th><th>Bonificación</th><th>Monto pagado</th><th>Fecha</th></tr>
+                </thead>
+                <tbody id="transitosBody">
+                  <tr><td>Peaje Sur</td><td>SAB1234</td><td>Motocicleta</td><td>$120</td><td>Frecuente</td><td>$96</td><td>2025-09-19</td></tr>
+                  <tr><td>Peaje Norte</td><td>SCD5678</td><td>Camión</td><td>$180</td><td>Trabajador</td><td>$144</td><td>2025-09-18</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="panel-title">
+            <strong>Notificaciones del sistema</strong>
+            <div class="actions"><button class="btn btn" onclick="borrarNotificaciones()">Borrar notificaciones</button></div>
+          </div>
+          <ul id="notificacionesList" style="margin:0;padding-left:16px;color:var(--muted)">
+            <li>Saldo bajo: su saldo quedó por debajo del mínimo de alerta.</li>
+            <li>Bonificación Frecuente asignada para Peaje Norte.</li>
+          </ul>
+        </div>
+      </main>
+
+      <!-- columna lateral -->
+      <aside>
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div class="small-muted">Resumen propietario</div>
+              <div id="nombreMini2" style="font-weight:700;margin-top:6px">Juan Pérez</div>
+            </div>
+            <div style="text-align:right">
+              <div class="badge" id="badgeEstado">Activo</div>
+              <div style="margin-top:8px;color:var(--muted)">$ 2.540,00</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:12px">
+          <strong>Atajos</strong>
+          <ul style="margin-top:10px;padding-left:16px;color:var(--muted)">
+            <li><a href="#">Registrar vehículo</a></li>
+            <li><a href="#">Recargar saldo</a></li>
+            <li><a href="#">Historial de tránsitos</a></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <strong>Contacto</strong>
+          <p style="margin-top:8px;color:var(--muted);font-size:14px">Soporte: soporte@peaje.example</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    function borrarNotificaciones(){
+      document.getElementById('notificacionesList').innerHTML = '<li>No hay notificaciones</li>';
+      if(typeof mostrarMensaje==='function') mostrarMensaje('Notificaciones borradas');
+      else alert('Notificaciones borradas');
+    }
+
+    // Si quieres poblar con datos reales desde la API:
+    // fetch('/propietarios/vistaConectada').then(r=>r.json()).then(data=>console.log(data));
+  </script>
 </body>
 </html>

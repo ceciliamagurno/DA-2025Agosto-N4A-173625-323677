@@ -162,7 +162,7 @@ public class Fachada {
     }
 
     public List<Administrador> getAdministradores() {
-        return sUsuarios.getAdministradores();
+        return sUsuarios.listaAdministradores();
     }
 
     // public ControladorLogin getServicioUsuarios() {

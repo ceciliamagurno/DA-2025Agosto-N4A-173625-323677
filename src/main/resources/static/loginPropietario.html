@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Propietario</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="vistaWeb.js"></script>
 </head>
 <body>
+    <script src="utilesVista.js"></script>
     <div class="container">
         <div class="card" style="max-width:480px;margin:3rem auto;text-align:center;">
             <h1 class="brand">Login - Propietario</h1>
@@ -23,12 +25,12 @@
         </div>
     </div>
 
-    <script src="utilesVista.js"></script>
-    <script src="vistaWeb.js"></script>
+    
+    
     <script>
         function enviarLogin(){
-            const data = serializarFormulario('formLogin');
-            submit('/login/login', data, 'POST');
+            event.preventDefault();
+            submit('/login/login', serializarFormulario('formLogin'));
         }
 
          function mostrar_loginExitoso(parametro){
@@ -36,8 +38,12 @@
             window.location.href = parametro;
         }
 
-        function excepcionDeAplicacion(mensaje){
-            alert('Error: ' + mensaje);
+        async function excepcionDeAplicacion(mensaje){
+            await mostrar_error('Error: ' + mensaje);
+        }
+
+        async function mostrar_error(mensaje) {
+            await mostrarMensaje(mensaje);
         }
     </script>
 </body>

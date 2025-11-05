@@ -103,10 +103,10 @@ public class PeajeApplication {
             2000.0,
             500.0,
             Arrays.asList(v1),
-            habilitado
+            deshabilitado
         );
         Propietario prop2 = new Propietario(
-            "34567890",
+            "2",
             "prop2.123",
             "Propietario Dos",
             1000.0,
