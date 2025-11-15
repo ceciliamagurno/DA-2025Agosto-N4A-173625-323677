@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignar Bonificaciones (Prueba)</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Asignar Bonificaciones</h1>
+        <p>Panel para asignar bonificaciones a un propietario.</p>
+
+        <div style="display:grid; grid-template-columns: 360px 1fr; gap:16px; margin-top:18px; align-items:start;">
+            <!-- Columna izquierda: selects (bonificaciones, puestos) y botón asignar -->
+            <div>
+                <div class="card">
+                    <h3>Bonificaciones (definidas)</h3>
+                    <div id="selectBonificaciones"></div>
+                    <h3 style="margin-top:12px;">Puestos (definidos)</h3>
+                    <div id="selectPuestos"></div>
+                </div>
+
+                <div style="margin-top:10px; text-align:center;">
+                    <button id="btnAsignar" class="btn primary">Asignar Bonificación</button>
+                </div>
+            </div>
+
+            <!-- Columna derecha: buscar propietario, mostrar datos y asignaciones -->
+            <div>
+                <div class="card">
+                    <label for="cedula">Cédula propietario</label>
+                    <div style="display:flex; gap:8px; margin-top:8px;">
+                        <input id="cedula" name="cedula" placeholder="23456789" style="flex:1; padding:8px;">
+                        <button id="btnBuscar" class="btn">Buscar</button>
+                    </div>
+                </div>
+
+                <div id="infoPropietario" style="display:none; margin-top:12px;">
+                    <div class="card">
+                        <h3>Datos del propietario</h3>
+                        <p><strong>Nombre:</strong> <span id="nombreProp">-</span></p>
+                        <p><strong>Estado:</strong> <span id="estadoProp">-</span></p>
+                    </div>
+
+                    <div class="card" style="margin-top:12px;">
+                        <h3>Bonificaciones asignadas</h3>
+                        <div id="tablaAsignaciones">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mensajeArea" style="margin-top:12px; display:none;"></div>
+
+        <p style="margin-top:24px;"><a href="admin.html">Volver al panel administrador</a></p>
+    </div>
+
+    <script src="utilesVista.js"></script>
+    <script>
+        const btnBuscar = document.getElementById('btnBuscar');
+        const btnAsignar = document.getElementById('btnAsignar');
+        const cedulaInput = document.getElementById('cedula');
+        const infoProp = document.getElementById('infoPropietario');
+        const nombreProp = document.getElementById('nombreProp');
+        const estadoProp = document.getElementById('estadoProp');
+        const tablaAsignacionesDiv = document.getElementById('tablaAsignaciones');
+        const selectBonificacionesDiv = document.getElementById('selectBonificaciones');
+        const selectPuestosDiv = document.getElementById('selectPuestos');
+        const mensajeArea = document.getElementById('mensajeArea');
+
+        let propietarioEncontrado = null;
+        let bonificacionesSistema = [];
+        let puestosSistema = [];
+
+        // Cargar listas iniciales (bonificaciones y puestos)
+        async function cargarListas() {
+            try {
+                const resp = await fetch('/tablero/listas');
+                if (!resp.ok) throw new Error('Error al cargar listas');
+                const data = await resp.json();
+                const bonResp = data.find(r => r.id === 'bonificaciones');
+                const puestosResp = data.find(r => r.id === 'puestos');
+                bonificacionesSistema = Array.isArray(bonResp && bonResp.parametro) ? bonResp.parametro : [];
+                puestosSistema = Array.isArray(puestosResp && puestosResp.parametro) ? puestosResp.parametro : [];
+
+                // Normalizar entradas: aceptar strings o objetos
+                bonificacionesSistema = bonificacionesSistema.map(item => {
+                    if (!item && item !== 0) return { nombre: '' };
+                    if (typeof item === 'string') return { nombre: item };
+                    if (typeof item === 'number' || typeof item === 'boolean') return { nombre: String(item) };
+                    if (item.hasOwnProperty && item.hasOwnProperty('nombre')) return item;
+                    return { nombre: String(item) };
+                });
+                puestosSistema = puestosSistema.map(item => {
+                    if (!item && item !== 0) return { nombre: '' };
+                    if (typeof item === 'string') return { nombre: item };
+                    if (typeof item === 'number' || typeof item === 'boolean') return { nombre: String(item) };
+                    if (item.hasOwnProperty && item.hasOwnProperty('nombre')) return item;
+                    return { nombre: String(item) };
+                });
+
+                selectBonificacionesDiv.innerHTML = crearListaDesdeJson({ data: bonificacionesSistema, campoMostrar: 'nombre', campoValor: 'nombre', id: 'selBon', mostrarOpcionInicial: true });
+                selectPuestosDiv.innerHTML = crearListaDesdeJson({ data: puestosSistema, campoMostrar: 'nombre', campoValor: 'nombre', id: 'selPuestos', mostrarOpcionInicial: true });
+            } catch (err) {
+                console.error(err);
+                await mostrarMensaje('No se pudieron cargar las listas del sistema.');
+            }
+        }
+
+        // Buscar propietario y sus asignaciones
+        btnBuscar.addEventListener('click', async () => {
+            const cedula = cedulaInput.value && cedulaInput.value.trim();
+            if (!cedula) { await mostrarMensaje('Ingrese una cédula para buscar.'); return; }
+            try {
+                const resp = await fetch(`/tablero/buscar?cedula=${encodeURIComponent(cedula)}`);
+                if (!resp.ok) throw new Error('Error en la búsqueda');
+                const data = await resp.json();
+                const propResp = data.find(r => r.id === 'propietario');
+                const asignResp = data.find(r => r.id === 'asignaciones');
+                if (!propResp || !propResp.parametro) { await mostrarMensaje('no existe el propietario'); return; }
+                propietarioEncontrado = propResp.parametro;
+                nombreProp.textContent = propietarioEncontrado.nombreCompleto || '-';
+                const estadoObj = propietarioEncontrado.estado || {};
+                estadoProp.textContent = estadoObj.nombre || (estadoObj ? String(estadoObj) : '-');
+
+                const asignaciones = Array.isArray(asignResp && asignResp.parametro) ? asignResp.parametro : [];
+                const tablaData = asignaciones.map(a => ({
+                    bonificacion: a.bonificacion ? a.bonificacion.nombre : (a.bonificacion || ''),
+                    puesto: a.puesto ? a.puesto.nombre : (a.puesto || ''),
+                    fechaAsignacion: a.fechaAsignacion || ''
+                }));
+                tablaAsignacionesDiv.innerHTML = crearTablaDesdeJson(tablaData);
+                infoProp.style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                await mostrarMensaje('Ocurrió un error al buscar el propietario.');
+            }
+        });
+
+        // Asignar bonificacion (usa selecciones de la columna izquierda)
+        btnAsignar.addEventListener('click', async () => {
+            if (!propietarioEncontrado) { await mostrarMensaje('Primero busque un propietario.'); return; }
+            const selBon = document.getElementById('selBon');
+            const selPuestos = document.getElementById('selPuestos');
+            if (!selBon || selBon.value === '-1') { await mostrarMensaje('Debe especificar una bonificación'); return; }
+            if (!selPuestos || selPuestos.value === '-1') { await mostrarMensaje('Debe especificar un puesto'); return; }
+            const nombreBon = selBon.options[selBon.selectedIndex].text;
+            const nombrePuesto = selPuestos.options[selPuestos.selectedIndex].text;
+
+            // Confirmar
+            const confirmar = await mostrarConfirmacion('¿Desea asignar la bonificación ' + nombreBon + ' para el puesto ' + nombrePuesto + '?');
+            if (!confirmar) return;
+
+            // Enviar POST
+            const body = 'cedula=' + encodeURIComponent(propietarioEncontrado.cedula || '') + '&nombreBonificacion=' + encodeURIComponent(nombreBon) + '&nombrePuesto=' + encodeURIComponent(nombrePuesto);
+            try {
+                const post = await fetch('/bonificaciones/asignar', { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded'}, body: body });
+                if (!post.ok) throw new Error('Error al asignar');
+                const resp = await post.json();
+                const mensajeResp = (resp.find && resp.find(r => r.id === 'mensaje')) ? resp.find(r => r.id === 'mensaje').parametro : null;
+                const asignacionesResp = (resp.find && resp.find(r => r.id === 'asignaciones')) ? resp.find(r => r.id === 'asignaciones').parametro : null;
+                if (mensajeResp) { await mostrarMensaje(mensajeResp); return; }
+                if (asignacionesResp) {
+                    const tablaData = asignacionesResp.map(a => ({ bonificacion: a.bonificacion ? a.bonificacion.nombre : '', puesto: a.puesto ? a.puesto.nombre : '', fechaAsignacion: a.fechaAsignacion }));
+                    tablaAsignacionesDiv.innerHTML = crearTablaDesdeJson(tablaData);
+                    await mostrarMensaje('Bonificación asignada correctamente');
+                }
+            } catch (err) {
+                console.error(err);
+                await mostrarMensaje('Error al asignar la bonificación.');
+            }
+        });
+
+        // Inicializar
+        cargarListas();
+    </script>
+</body>
+</html>

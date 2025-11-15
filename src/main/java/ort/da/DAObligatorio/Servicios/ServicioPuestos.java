@@ -3,7 +3,7 @@ package ort.da.DAObligatorio.servicios;
 import java.util.ArrayList;
 import java.util.List;
 
-import ort.da.DAObligatorio.modelo.Puesto;
+import ort.da.DAObligatorio.modelo.peajes.Puesto;
 
 public class ServicioPuestos {
     
@@ -25,7 +25,7 @@ public class ServicioPuestos {
     public Puesto buscarPuestoPorNombre(String nombre){
         if(nombre ==null || nombre.isEmpty())return null;
         for(Puesto p: puestos){
-            if(p.getNombre().equals(nombre)){
+            if (p.getNombre() != null && p.getNombre().trim().equalsIgnoreCase(nombre.trim())){
                 return p;
             }
         }

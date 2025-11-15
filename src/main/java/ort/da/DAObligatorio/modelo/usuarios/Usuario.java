@@ -1,4 +1,4 @@
-package ort.da.DAObligatorio.modelo;
+package ort.da.DAObligatorio.modelo.usuarios;
 
 public abstract class Usuario {
 
@@ -23,6 +23,11 @@ public abstract class Usuario {
 
     public String getCedula() {
         return cedula;
+    }
+
+    
+    public String getNombreCompleto() {
+        return nombreCompleto;
     }
 
     @Override

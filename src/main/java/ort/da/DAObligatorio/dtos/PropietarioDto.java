@@ -1,63 +1,72 @@
 package ort.da.DAObligatorio.dtos;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import ort.da.DAObligatorio.modelo.Bonificacion;
-import ort.da.DAObligatorio.modelo.Estado;
-import ort.da.DAObligatorio.modelo.Propietario;
+
+import ort.da.DAObligatorio.modelo.usuarios.Propietario;
+import ort.da.DAObligatorio.modelo.vehiculos.Vehiculo;
 
 public class PropietarioDto {
    
-    private String nombreCompleto;  
-    private Estado estado;
-    private double saldoActual;
-    private List<Bonificacion> bonificacionesDto;
-    private List<VehiculoDto> vehiculosDto;
-    private List<TransitoDto> transaccionesDto;
-    private List<NotificacionDto> notificacionesDto;
-    
-    public PropietarioDto(Propietario p) {
-        this.nombreCompleto = p.getNombreCompleto();
-        this.estado = p.getEstado();
-        this.saldoActual = p.getSaldoActual();
-        this.bonificacionesDto = p.getBonificaciones();
-        this.vehiculosDto = p.getVehiculos().stream()
-                                    .map(v -> new VehiculoDto(v))
-                                    .toList();
-        this.transaccionesDto = null; // Implementar si es necesario
-        this.notificacionesDto = null; // Implementar si es necesario
+    public String cedula;
+    public String nombreCompleto;
+    public String estado;
+    public double saldo;
+    public List<String> matriculas;
+
+    public PropietarioDto(Propietario propietario) {
+        this.cedula = propietario.getCedula();
+        this.nombreCompleto = propietario.getNombreCompleto();
+        this.estado = propietario.getEstado().nombre();
+        this.saldo = propietario.getSaldo();
+        this.matriculas =  new ArrayList<String>();
+        for(Vehiculo c :propietario.getVehiculos()){
+            this.matriculas.add( c.getMatricula());
+        }
+    }
+
+    public PropietarioDto(){}
+
+    public String getCedula() {
+        return cedula;
+    }
+
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
     }
 
     public String getNombreCompleto() {
         return nombreCompleto;
     }
 
-    public Estado getEstado() {
+    public void setNombreCompleto(String nombreCompleto) {
+        this.nombreCompleto = nombreCompleto;
+    }
+
+    public String getEstado() {
         return estado;
     }
 
-    public double getSaldoActual() {
-        return saldoActual;
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 
-    public List<Bonificacion> getBonificacionesDto() {
-        return bonificacionesDto;
+    public double getSaldo() {
+        return saldo;
     }
 
-    public List<VehiculoDto> getVehiculosDto() {
-        return vehiculosDto;
+    public void setSaldo(double saldo) {
+        this.saldo = saldo;
     }
 
-    public List<TransitoDto> getTransaccionesDto() {
-        return transaccionesDto;
+    public List<String> getMatriculas() {
+        return matriculas;
     }
 
-    public List<NotificacionDto> getNotificacionesDto() {
-        return notificacionesDto;
+    public void setMatriculas(List<String> matriculas) {
+        this.matriculas = matriculas;
     }
 
     
-
-    
-
 }

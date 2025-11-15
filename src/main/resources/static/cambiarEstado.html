@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambiar Estado de Propietario</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Cambiar estado de un propietario</h1>
+
+        <section id="resultado" style="margin-top:20px;">
+            <div class="grid-two">
+                <div class="col-cedula">
+                    <label for="cedula">Cédula del propietario</label>
+                    <input type="text" id="cedula" name="cedula" placeholder="Ingrese cédula">
+                    <div style="margin-top:12px; text-align:left;">
+                        <button id="btnBuscar">Buscar</button>
+                    </div>
+                </div>
+
+                <div class="col-estados">
+                    <h3>Seleccionar nuevo estado</h3>
+                    <div id="listaEstados">
+                        <select id="selectEstados">
+                            <option value="-1">Seleccione una opción...</option>
+                        </select>
+                    </div>
+                    <div style="margin-top:12px; text-align:right;">
+                        <button id="btnCambiar">Cambiar estado</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="datos-propietario" style="margin-top:18px;">
+                <h2>Propietario</h2>
+                <div class="grid-two">
+                    <div><strong>Nombre:</strong> <span id="nombreProp">-</span></div>
+                    <div><strong>Estado actual:</strong> <span id="estadoActual">-</span></div>
+                </div>
+            </div>
+        </section>
+
+        <p style="margin-top:24px;"><a href="admin.html">Volver al panel administrador</a></p>
+    </div>
+
+    <script src="utilesVista.js"></script>
+    <style>
+        body { font-family: Arial, Helvetica, sans-serif; background: #f6f8fb; color: #222; }
+        .container { max-width: 900px; margin: 36px auto; background: #fff; padding: 24px; border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+        h1 { margin-top: 0; color: #214e8a; }
+    section#busqueda { display:flex; gap:8px; align-items:center; }
+    section#busqueda input { padding:8px 10px; width:260px; border:1px solid #d0d7e2; border-radius:6px; }
+        .grid-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+        .col-cedula input { padding:8px 10px; width:100%; border:1px solid #d0d7e2; border-radius:6px; }
+        .col-estados select { width:100%; padding:8px; border-radius:6px; border:1px solid #d0d7e2; }
+        .datos-propietario .grid-two { grid-template-columns: 1fr 1fr; }
+        /* Alinear títulos en ambas columnas */
+        .col-cedula label, .col-estados h3 {
+            margin: 0 0 8px 0;
+            color: #214e8a;
+            font-size: 1.05rem;
+            line-height: 1.2;
+            display: block;
+        }
+        section#busqueda button, #btnCambiar { background:#214e8a; color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; }
+        #resultado { margin-top:18px; background: #fbfcfe; padding: 16px; border-radius:8px; border: 1px solid #eef3fb; }
+        p strong { color:#333; }
+        #listaEstados select { width:100%; padding:8px; border-radius:6px; border:1px solid #d0d7e2; }
+        #btnCambiar { margin-top:8px; }
+        .mensaje { margin-top:12px; padding:10px; border-radius:6px; display:none; }
+        .mensaje.error { background:#feecec; color:#a33; border:1px solid #f5c6cb; }
+        .mensaje.info { background:#eef8ff; color:#035; border:1px solid #cfe7ff; }
+    </style>
+
+    <script>
+        const btnBuscar = document.getElementById('btnBuscar');
+        const btnCambiar = document.getElementById('btnCambiar');
+        const cedulaInput = document.getElementById('cedula');
+        const resultado = document.getElementById('resultado');
+        const nombreProp = document.getElementById('nombreProp');
+        const estadoActualSpan = document.getElementById('estadoActual');
+        const listaEstadosDiv = document.getElementById('listaEstados');
+
+        let propietarioEncontrado = null;
+        let estadosSistema = [];
+
+        // permitir buscar también con Enter en el input
+        cedulaInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                btnBuscar.click();
+            }
+        });
+
+        btnBuscar.addEventListener('click', async () => {
+            const cedula = cedulaInput.value && cedulaInput.value.trim();
+            if (!cedula) {
+                await mostrarMensaje('Ingrese una cédula para buscar.');
+                return;
+            }
+
+            try {
+                const resp = await fetch(`/tablero/buscar?cedula=${encodeURIComponent(cedula)}`);
+                if (!resp.ok) throw new Error('Error en la búsqueda');
+                const data = await resp.json();
+
+                // data es un array de respuestas {id, parametro}
+                const propResp = data.find(r => r.id === 'propietario');
+                const estadosResp = data.find(r => r.id === 'estados');
+
+                if (!propResp || !propResp.parametro) {
+                    await mostrarMensaje('no existe el propietario');
+                    return;
+                }
+
+                propietarioEncontrado = propResp.parametro;
+                estadosSistema = Array.isArray(estadosResp && estadosResp.parametro) ? estadosResp.parametro : [];
+
+                        // Normalizar: cada elemento debe ser un objeto con campo 'nombre'
+                        estadosSistema = estadosSistema.map(item => {
+                            if (!item && item !== 0) return { nombre: '' };
+                            if (typeof item === 'string') return { nombre: item };
+                            if (typeof item === 'number' || typeof item === 'boolean') return { nombre: String(item) };
+                            if (item.hasOwnProperty('nombre')) return item;
+                            return { nombre: String(item) };
+                        });
+
+                // Mostrar datos del propietario (solo nombre y estado actual en la zona inferior)
+                nombreProp.textContent = propietarioEncontrado.nombreCompleto || '-';
+
+                // estado puede venir como objeto
+                const estadoObj = propietarioEncontrado.estado || {};
+                estadoActualSpan.textContent = estadoObj.nombre || (estadoObj ? String(estadoObj) : '-');
+
+                        // Si backend no trae estados, usar fallback cliente
+                        if (!Array.isArray(estadosSistema) || estadosSistema.length === 0) {
+                            estadosSistema = [
+                                { nombre: 'Habilitado' },
+                                { nombre: 'Deshabilitado' },
+                                { nombre: 'Suspendido' },
+                                { nombre: 'Penalizado' }
+                            ];
+                        }
+
+                        // Poblar select nativo con los estados (reemplaza el contenido previo)
+                        const selectEstados = document.getElementById('selectEstados') || document.createElement('select');
+                        selectEstados.id = 'selectEstados';
+                        selectEstados.name = 'selectEstados';
+                        selectEstados.style.width = '100%';
+                        selectEstados.style.padding = '8px';
+                        selectEstados.innerHTML = '';
+                        const optionInit = document.createElement('option');
+                        optionInit.value = '-1';
+                        optionInit.text = 'Seleccione una opción...';
+                        selectEstados.appendChild(optionInit);
+
+                        estadosSistema.forEach((e, idx) => {
+                            const opt = document.createElement('option');
+                            const texto = e.nombre !== undefined ? e.nombre : `(sin nombre)`;
+                            opt.value = texto;
+                            opt.text = texto;
+                            selectEstados.appendChild(opt);
+                        });
+
+                        // colocar el select dentro del contenedor
+                        listaEstadosDiv.innerHTML = '';
+                        listaEstadosDiv.appendChild(selectEstados);
+
+                        // seleccionar por texto el estado actual si existe (normalizar: quitar acentos, trim, lowercase)
+                        try {
+                            const valorEstadoActual = (estadoObj && (estadoObj.nombre || estadoObj)) ? String(estadoObj.nombre || estadoObj) : '';
+                            function normalizar(s) {
+                                if (!s) return '';
+                                // quitar acentos, trim y pasar a minúsculas
+                                return String(s).normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+                            }
+
+                            if (valorEstadoActual) {
+                                const buscado = normalizar(valorEstadoActual);
+                                let encontrado = false;
+
+                                // Intento 1: igualdad exacta normalizada
+                                for (let i = 0; i < selectEstados.options.length; i++) {
+                                    const optText = normalizar(selectEstados.options[i].text || selectEstados.options[i].value || '');
+                                    if (optText === buscado) {
+                                        selectEstados.selectedIndex = i;
+                                        encontrado = true;
+                                        break;
+                                    }
+                                }
+
+                                // Intento 2: incluir (por si backend tiene textos compuestos)
+                                if (!encontrado) {
+                                    for (let i = 0; i < selectEstados.options.length; i++) {
+                                        const optText = normalizar(selectEstados.options[i].text || selectEstados.options[i].value || '');
+                                        if (optText.includes(buscado) || buscado.includes(optText)) {
+                                            selectEstados.selectedIndex = i;
+                                            encontrado = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                // Si aún no encontrado, añadir una opción con el estado actual y seleccionarla
+                                if (!encontrado) {
+                                    console.warn('No se encontró coincidencia para estado actual en options; creando opción con el valor actual:', valorEstadoActual);
+                                    const opt = document.createElement('option');
+                                    opt.value = valorEstadoActual;
+                                    opt.text = valorEstadoActual + ' (actual)';
+                                    selectEstados.appendChild(opt);
+                                    selectEstados.selectedIndex = selectEstados.options.length - 1;
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Error al intentar seleccionar el estado actual en el select', e);
+                        }
+
+                        resultado.style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                await mostrarMensaje('Ocurrió un error al buscar el propietario.');
+            }
+        });
+
+        btnCambiar.addEventListener('click', async () => {
+            if (!propietarioEncontrado) {
+                await mostrarMensaje('Primero busque un propietario.');
+                return;
+            }
+            const select = document.getElementById('selectEstados');
+            if (!select) {
+                await mostrarMensaje('No hay estados para seleccionar.');
+                return;
+            }
+            const selectedOption = select.options[select.selectedIndex];
+            if (!selectedOption || selectedOption.value === '-1') {
+                await mostrarMensaje('Seleccione un estado.');
+                return;
+            }
+            const nombreEstado = selectedOption.text;
+
+            // Validación local: si es igual al actual
+            const estadoActual = (propietarioEncontrado.estado && propietarioEncontrado.estado.nombre) ? propietarioEncontrado.estado.nombre : '';
+            if (estadoActual && estadoActual.toLowerCase() === nombreEstado.toLowerCase()) {
+                await mostrarMensaje('El propietario ya esta en estado ' + estadoActual);
+                return;
+            }
+
+            // Confirmar
+            const confirmar = await mostrarConfirmacion('¿Desea cambiar el estado del propietario a "' + nombreEstado + '"?');
+            if (!confirmar) return;
+
+            // Enviar POST
+            const body = 'cedula=' + encodeURIComponent(propietarioEncontrado.cedula || document.getElementById('cedula').value) + '&nombreEstado=' + encodeURIComponent(nombreEstado);
+            try {
+                const post = await fetch('/estados/cambiar', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: body
+                });
+                if (!post.ok) throw new Error('Error en cambio de estado');
+                const resp = await post.json();
+                // buscar mensaje de respuesta
+                const mensaje = (resp.find && resp.find(r => r.id === 'mensaje')) ? resp.find(r => r.id === 'mensaje').parametro : null;
+                const estadoCambiado = (resp.find && resp.find(r => r.id === 'estadoCambiado')) ? resp.find(r => r.id === 'estadoCambiado').parametro : null;
+
+                if (mensaje) {
+                    await mostrarMensaje(mensaje);
+                } else if (estadoCambiado) {
+                    // actualizar vista
+                    propietarioEncontrado = estadoCambiado;
+                    nombreProp.textContent = propietarioEncontrado.nombreCompleto || '-';
+                    const nuevoEstado = propietarioEncontrado.estado || {};
+                    estadoActualSpan.textContent = nuevoEstado.nombre || '-';
+                    await mostrarMensaje('Estado cambiado correctamente');
+                } else {
+                    await mostrarMensaje('Operación finalizada');
+                }
+
+            } catch (err) {
+                console.error(err);
+                await mostrarMensaje('Error al cambiar el estado del propietario.');
+            }
+        });
+    </script>
+</body>
+</html>

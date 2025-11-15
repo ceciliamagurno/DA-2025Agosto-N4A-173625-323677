@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emular Tránsito (Prueba)</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Emular Tránsito</h1>
+        
+        <div class="emular-grid" style="display:flex; gap:24px; align-items:flex-start;">
+            <!-- Columna izquierda: formulario -->
+            <div style="flex:1; min-width:260px;">
+                <form id="formEmular">
+                    <label for="puestoSelect">Puesto</label><br>
+                    <select id="puestoSelect" name="puesto"></select><br><br>
+
+                    <label for="matricula">Matrícula</label><br>
+                    <input id="matricula" name="matricula" placeholder="ABC123"><br><br>
+
+                    <label for="fechaHora">Fecha y hora (opcional)</label><br>
+                    <input id="fechaHora" name="fechaHora" type="datetime-local"><br>
+                    <small>Si no completa la fecha, se usará la fecha/hora actual del servidor.</small>
+                    <br><br>
+
+                    <button type="submit" class="btn primary">Simular</button>
+                     <p style="margin-top:24px;"><a href="admin.html">Volver al panel administrador</a></p>
+                </form>
+
+                <div id="msg" style="margin-top:12px; display:none;"></div>
+                <div id="resultado" style="margin-top:12px; display:none;"></div>
+            </div>
+
+            <!-- Columna derecha: tarifas del puesto seleccionado -->
+            <aside style="width:360px; max-width:40%;">
+                <div id="tarifasContainer" style="display:block; border:1px solid #ddd; padding:12px; border-radius:6px; background:#fafafa; min-height:120px;">
+                    <h3 style="margin-top:0;">Tarifas del puesto</h3>
+                    <div style="display:flex; gap:8px; align-items:center; justify-content:space-between;">
+                        <div id="noTarifasMsg" style="color:#666;">Seleccione un puesto para ver sus tarifas.</div>
+                    </div>
+                    <table id="tarifasTable" style="width:100%; border-collapse:collapse; display:none; margin-top:8px;">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left; padding:6px; border-bottom:1px solid #eee;">Categoría</th>
+                                <th style="text-align:right; padding:6px; border-bottom:1px solid #eee;">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const msg = document.getElementById('msg');
+        const resultadoDiv = document.getElementById('resultado');
+
+        // cargar puestos al inicio
+        async function cargarPuestos() {
+        try {
+            const r = await fetch('/transitos/puestos');
+            const data = await r.json();
+            // buscar respuesta con id 'puestos' y normalizar
+            const respPuestos = data.find ? data.find(x => x.id === 'puestos') : null;
+            let puestos = respPuestos ? respPuestos.parametro : (Array.isArray(data) ? data : []);
+                puestos = Array.isArray(puestos) ? puestos : [];
+                // Normalizar entradas: aceptar objetos o strings
+                puestos = puestos.map(item => {
+                    if (item == null) return { nombre: '' };
+                    if (typeof item === 'string') return { nombre: item };
+                    if (typeof item === 'object' && item.hasOwnProperty('nombre')) return item;
+                    // fallback: convertir a string
+                    return { nombre: String(item) };
+                });
+
+                const select = document.getElementById('puestoSelect');
+                select.innerHTML = '';
+                puestos.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.nombre || '';
+                    opt.textContent = p.nombre || String(p);
+                    select.appendChild(opt);
+                });
+                if (puestos.length > 0) {
+                    // seleccionar la primera opción por defecto
+                    select.selectedIndex = 0;
+                    select.dispatchEvent(new Event('change'));
+                }
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.textContent = 'Error cargando puestos: ' + err;
+            }
+        }
+
+        document.getElementById('puestoSelect').addEventListener('change', async function(e){
+            const nombre = e.target.value;
+            if (!nombre) return;
+            try {
+                const r = await fetch('/transitos/tarifas?nombrePuesto=' + encodeURIComponent(nombre));
+                const data = await r.json();
+
+                // Normalizar distintas formas de respuesta:
+                // - [{ id: 'tarifas', parametro: [...] }, ...]
+                // - [{ categoria: 'Automóvil', monto: 50 }, ...]
+                // - { tarifas: [...] }
+                let tarifas = [];
+                if (Array.isArray(data)) {
+                    const found = data.find(x => x && x.id === 'tarifas');
+                    if (found && Array.isArray(found.parametro)) {
+                        tarifas = found.parametro;
+                    } else {
+                        // Podría ser que el endpoint devuelva directamente el array de tarifas
+                        // Detectar si los elementos parecen tarifas
+                        if (data.length > 0 && (data[0].hasOwnProperty('categoria') || data[0].hasOwnProperty('monto'))) {
+                            tarifas = data;
+                        }
+                    }
+                } else if (data && data.tarifas && Array.isArray(data.tarifas)) {
+                    tarifas = data.tarifas;
+                }
+
+                const tbody = document.querySelector('#tarifasTable tbody');
+                tbody.innerHTML = '';
+                const noMsg = document.getElementById('noTarifasMsg');
+                const tabla = document.getElementById('tarifasTable');
+                if (Array.isArray(tarifas) && tarifas.length > 0) {
+                    tarifas.forEach(t => {
+                        const tr = document.createElement('tr');
+                        const tdCat = document.createElement('td'); tdCat.textContent = t.categoria || (t.categoriaVehiculo ? t.categoriaVehiculo : '');
+                        const tdMon = document.createElement('td'); tdMon.textContent = (t.monto != null) ? t.monto : (t.valor != null ? t.valor : '');
+                        tdMon.style.textAlign = 'right';
+                        tdCat.style.padding = '6px'; tdMon.style.padding = '6px';
+                        tr.appendChild(tdCat); tr.appendChild(tdMon);
+                        tbody.appendChild(tr);
+                    });
+                    noMsg.style.display = 'none';
+                    tabla.style.display = 'table';
+                } else {
+                    // sin tarifas: mostrar mensaje dentro del contenedor (columna derecha seguirá visible)
+                    noMsg.style.display = 'block';
+                    tabla.style.display = 'none';
+                }
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.textContent = 'Error cargando tarifas: ' + err;
+            }
+        });
+
+        document.getElementById('formEmular').addEventListener('submit', async function(e){
+            e.preventDefault();
+            msg.style.display = 'none';
+            resultadoDiv.style.display = 'none';
+            const matricula = document.getElementById('matricula').value;
+            const puesto = document.getElementById('puestoSelect').value;
+            const fechaInput = document.getElementById('fechaHora').value; // e.g. 2025-11-09T14:30
+
+            if (!matricula || !puesto) {
+                msg.style.display = 'block';
+                msg.textContent = 'Complete matrícula y seleccione un puesto.';
+                return;
+            }
+
+            const params = new URLSearchParams();
+            params.append('matricula', matricula);
+            params.append('nombrePuesto', puesto);
+            if (fechaInput && fechaInput.trim().length > 0) {
+                // datetime-local returns local time without seconds, transform to ISO string without timezone
+                params.append('fechaHora', fechaInput);
+            }
+
+            try {
+                const r = await fetch('/transitos/emular', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+                const data = await r.json();
+                const mensaje = data.find(x => x.id === 'mensaje');
+                if (mensaje) {
+                    msg.style.display = 'block';
+                    msg.textContent = mensaje.parametro;
+                    return;
+                }
+                const resp = data.find(x => x.id === 'resultado');
+                if (resp) {
+                    const info = resp.parametro;
+                    resultadoDiv.style.display = 'block';
+                    resultadoDiv.innerHTML = `<strong>Propietario:</strong> ${info.propietario} <br>
+                    <strong>Estado:</strong> ${info.estado} <br>
+                    <strong>Categoría:</strong> ${info.categoria} <br>
+                    <strong>Bonificación aplicada:</strong> ${info.bonificacion ? info.bonificacion : '-'} <br>
+                    <strong>Costo del tránsito:</strong> $ ${info.monto} <br>
+                    <strong>Saldo del propietario luego del tránsito:</strong> $ ${info.saldo}`;
+                } else {
+                    msg.style.display = 'block';
+                    msg.textContent = 'Respuesta inesperada del servidor.';
+                }
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.textContent = 'Error registrando tránsito: ' + err;
+            }
+        });
+
+        // Inicializar
+        cargarPuestos();
+        
+    </script>
+</body>
+</html>

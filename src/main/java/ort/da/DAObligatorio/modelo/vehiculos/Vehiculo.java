@@ -1,4 +1,4 @@
-package ort.da.DAObligatorio.modelo;
+package ort.da.DAObligatorio.modelo.vehiculos;
 
 public class Vehiculo {
     

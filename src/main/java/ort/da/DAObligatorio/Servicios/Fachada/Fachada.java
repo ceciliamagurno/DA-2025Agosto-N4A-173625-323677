@@ -1,15 +1,27 @@
 package ort.da.DAObligatorio.servicios.fachada;
 
-import ort.da.DAObligatorio.modelo.*;
 
-import java.util.ArrayList;
+import ort.da.DAObligatorio.modelo.bonificaciones.Bonificacion;
+import ort.da.DAObligatorio.modelo.estados.Estado;
+import ort.da.DAObligatorio.modelo.peajes.AsignacionDeBonificacion;
+import ort.da.DAObligatorio.modelo.peajes.Notificacion;
+import ort.da.DAObligatorio.modelo.peajes.Puesto;
+import ort.da.DAObligatorio.modelo.peajes.Tarifa;
+import ort.da.DAObligatorio.modelo.peajes.Transito;
+import ort.da.DAObligatorio.modelo.usuarios.Administrador;
+import ort.da.DAObligatorio.modelo.usuarios.Propietario;
+import ort.da.DAObligatorio.modelo.usuarios.Usuario;
+import ort.da.DAObligatorio.modelo.vehiculos.CategoriaVehiculo;
+import ort.da.DAObligatorio.modelo.vehiculos.Vehiculo;
+import ort.da.DAObligatorio.observador.Observable;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 import ort.da.DAObligatorio.servicios.*;
-//import ort.da.DAObligatorio.controladores.ControladorLogin;
 import ort.da.DAObligatorio.excepciones.PeajeException;
 
-public class Fachada {
+public class Fachada extends Observable{
     
     private static Fachada instancia;
     //servicios
@@ -20,12 +32,8 @@ public class Fachada {
     private ServicioBonificaciones sBonificaciones;
     private ServicioTarifas sTarifas;
     private ServicioNotificaciones sNotificaciones;    
-    // lISTAS PARA LA PRECARGA ESTAS LISTAS DEBEN ESTAR EN LOS SERVICIOS QUE AUN FALTAN REFACTORIZAR DESPUES
-    private List<Puesto> puestos;
-    private List<CategoriaVehiculo> categorias;
-    private List <Tarifa> tarifas;
-    private List<Bonificacion> bonificaciones;
-    private List<Estado> estados;
+    private ServicioEstados sEstados;
+
     
     
 
@@ -38,12 +46,9 @@ public class Fachada {
         this.sBonificaciones = new ServicioBonificaciones();
         this.sTarifas = new ServicioTarifas();
         this.sNotificaciones = new ServicioNotificaciones();
-        
-        this.puestos = new ArrayList<>();
-        this.categorias = new ArrayList<>();
-        this.tarifas = new ArrayList<>();
-        this.bonificaciones = new ArrayList<>();
-        this.estados = new ArrayList<>();
+        this.sEstados = new ServicioEstados();
+    
+        this.agregarObservador(sNotificaciones);
     }
 
     public static Fachada getInstancia() {
@@ -53,57 +58,186 @@ public class Fachada {
         return instancia;
     }
 
- // Exponer servicios si algún código los necesita directamente
-    public ServicioUsuarios getServicioUsuarios() { return sUsuarios; }
-    public ServicioVehiculos getServicioVehiculos() { return sVehiculos; }
-    public ServicioPuestos getServicioPuestos() { return sPuestos; }
-    public ServicioTransitos getServicioTransitos() { return sTransitos; }
-    public ServicioBonificaciones getServicioBonificaciones() { return sBonificaciones; }
-    public ServicioTarifas getServicioTarifas() { return sTarifas; }
-    public ServicioNotificaciones getServicioNotificaciones() { return sNotificaciones; }
 
-    public void agregarPropietario(Propietario propietario) throws PeajeException {
-        sUsuarios.agregarPropietario(propietario);
+
+    //Servicio Usuarios 
+    public Usuario login(String cedula, String contrasenia) {
+        return sUsuarios.login(cedula, contrasenia);
     }
 
-    public void agregarAdministrador(Administrador administrador) {
-        sUsuarios.agregarAdministrador(administrador);
+    public void agregarAdministrador(Administrador admin) {
+        sUsuarios.agregarAdministrador(admin);
+    }
+
+    public void agregarPropietario(Propietario prop) {
+        sUsuarios.agregarPropietario(prop);
+    }
+
+    public Propietario buscarPropietarioPorCedula(String cedula) {
+        return sUsuarios.buscarPropietarioPorCedula(cedula);
+    }
+
+    public Administrador buscarAdministradorPorCedula(String cedula) {
+        return sUsuarios.buscarAdministradorPorCedula(cedula);
+    }
+
+    public List<Propietario> listarPropietarios() {
+        return sUsuarios.listarPropietarios();
+    }
+
+    public List<Administrador> listarAdministradores() {
+        return sUsuarios.listarAdministradores();
     }
 
     public Propietario buscarPropietarioPorMatricula(String matricula) {
         return sUsuarios.buscarPropietarioPorMatricula(matricula);
     }
-
     
+
+
+
+
+
+    //Servicio Estados
+    public List<Estado> getEstadosDisponibles() {
+        return sEstados.obtenerEstadosDisponibles();
+    }
+
+     public void cambiarEstadoPropietario(String cedula, String nombreEstado) throws PeajeException {
+        if (cedula == null || nombreEstado == null) {
+            throw new PeajeException("Debe indicar cédula y estado.");
+        }
+
+        Estado nuevoEstado = sEstados.obtenerEstadoPorNombre(nombreEstado);
+        if (nuevoEstado == null) {
+            throw new PeajeException("Estado inválido: " + nombreEstado);
+        }
+
+        // Reutilizamos el helper que trabaja con Estado ya resuelto
+        cambiarEstadoPropietario(cedula, nuevoEstado);
+    }
+
+    private void cambiarEstadoPropietario(String cedula, Estado e) throws PeajeException {
+        sUsuarios.cambiarEstadoPropietario(cedula, e);
+
+        Propietario p = sUsuarios.buscarPropietarioPorCedula(cedula);
+        if (p == null){
+            return;
+        }
+        //armar evento para avisar a los observadores
+        Object[] ev = new Object[3];
+            ev[0] = p;
+            ev[1] = "ESTADO_CAMBIADO";
+            ev[2] = e.nombre();
+            
+            this.avisar(ev);
+        
+    }
+
+
+
+
+
+
+    //Servicio Bonificaciones
+    public List<Bonificacion> obtenerBonificaciones() {
+        return sBonificaciones.obtenerBonificaciones();
+    }
+
+    public Bonificacion buscarBonificacion(String nombre) {
+        return sBonificaciones.buscarBonificacionPorNombre(nombre);
+    }
+
+    public void agregarBonificacion(Bonificacion bn) {
+        sBonificaciones.agregarBonificacion(bn);
+    }
+
+    public void asignarBonificacionAPropietario(Propietario propietario, Bonificacion b, Puesto p)
+            throws PeajeException {
+        sBonificaciones.asignarBonificacionAPropietario(propietario, b, p);
+
+        //armo evento para avisar a los observadores
+        Object[] ev = new Object[3];
+        ev[0] = propietario;
+        ev[1] = "ASIGNACION_BONIFICACION";
+        ev[2] = b.getNombre();
+    }
+
+    public List<AsignacionDeBonificacion> obtenerAsignacionesPorPropietario(Propietario propietario) {
+        return sBonificaciones.obtenerAsignacionesPorPropietario(propietario);
+    }
+
+
+
+
+
+
+    //Servicio Transitos
+
+    public void agregarTransito(Transito transito){
+        sTransitos.agregarTransito(transito);
+    }
+
+    public List<Transito> obtenerTransitos() {
+        return sTransitos.getTransitos();
+    }
+
+    public Transito registrarTransito(Vehiculo vehiculo, Puesto puesto, Tarifa tarifa, Propietario propietario,
+            List<AsignacionDeBonificacion> asignaciones, LocalDateTime fechaHora) throws PeajeException {
+        return sTransitos.registrarTransito(vehiculo, puesto, tarifa, propietario, asignaciones, fechaHora);
+    }
+
+    public List<Transito> obtenerTransitosPorPropietario(Propietario p) {
+        return sTransitos.obtenerTransitosPorPropietario(p);
+    }   
+
+    public RegistroResultadoTransito registrarTransito(
+        String matricula,
+        String nombrePuesto,
+        LocalDateTime fechaHora) throws PeajeException {
+        return sTransitos.registrarTransito(matricula, nombrePuesto, fechaHora);
+    }
+
+    public RegistroResultadoTransito registrarTransito(
+        String matricula,
+        String nombrePuesto) throws PeajeException {
+        return sTransitos.registrarTransito(matricula, nombrePuesto, LocalDateTime.now());
+    }
+
+
+
+    //Servicio Vehiculos
     public List<CategoriaVehiculo> obtenerCategorias() {
         return sVehiculos.obtenerCategorias();
+    }
+
+    public void agregarCategoriaVehiculo(CategoriaVehiculo categoria) {
+        sVehiculos.agregarCategoriaVehiculo(categoria);
     }
 
     public CategoriaVehiculo buscarCategoriaPorNombre(String nombre) {
         return sVehiculos.buscarCategoriaPorNombre(nombre);
     }
 
+    public boolean agregarVehiculo(Vehiculo vehiculo) {
+        return sVehiculos.agregarVehiculo(vehiculo);
+    }
+
     public Vehiculo buscarVehiculoPorMatricula(String matricula) {
         return sVehiculos.buscarVehiculoPorMatricula(matricula);
     }
 
-    public List<Propietario> listaPropietarios() {
-        return sUsuarios.listaPropietarios();
+
+
+
+
+    //Servicio puestos
+
+    public void agregarPuesto(Puesto p) {
+        sPuestos.agregarPuesto(p);
     }
 
-    public boolean registrarTransito(String matricula, String nombrePuesto) throws PeajeException {
-        return sTransitos.registrarTransito(matricula, nombrePuesto);
-    }
-
-    public void agregarTarigfa(Tarifa t) {
-        sTarifas.agregarTarigfa(t);
-    }
-
-    public List<Tarifa> obtenerTarifas() {
-        return sTarifas.obtenerTarifas();
-    }
-
-    public List<Puesto> obtenerPuestos() {
+    public List<Puesto> getPuestos() {
         return sPuestos.obtenerPuestos();
     }
 
@@ -111,87 +245,59 @@ public class Fachada {
         return sPuestos.buscarPuestoPorNombre(nombre);
     }
 
-    public void CrearNotificacion(String msj, Propietario p) {
-        sNotificaciones.CrearNotificacion(msj, p);
+
+
+
+
+
+    //Servicio Tarifas
+
+    public void agregarTarifa(Tarifa t) {
+        sTarifas.agregarTarifa(t);
     }
 
-    public List<Notificacion> obtenerNotificaciones() {
-        return sNotificaciones.obtenerNotificaciones();
-    }
-
-    public List<Bonificacion> obtenerBonificaciones() {
-        return sBonificaciones.obtenerBonificaciones();
-    }
-
-    public void asignarBonificacionAPropietario(Propietario cedula, Bonificacion b, Puesto p) throws PeajeException {
-        sBonificaciones.asignarBonificacionAPropietario(cedula, b, p);
+    public List<Tarifa> obtenerTarifas() {
+        return sTarifas.obtenerTarifas();
     }
 
     public Tarifa buscarTarifa(Puesto p, CategoriaVehiculo cv) {
         return sTarifas.buscarTarifa(p, cv);
     }
 
-    public void crearTarifa(Puesto p, CategoriaVehiculo cv, double monto) {
+    public void crearTarifa(Puesto p, CategoriaVehiculo cv, double monto) throws PeajeException {
         sTarifas.crearTarifa(p, cv, monto);
     }
 
+
+
+
+
+
+
+    //Servicio Notificaciones
+    public void agregarNotificacion(String msj, Propietario propietario) {
+        if (msj == null || propietario == null) {
+            return;
+        }
+        sNotificaciones.agregarNotificacion(msj, propietario);
+    }
+
+    public List<Notificacion> obtenerNotificacionesDelPropietario(Propietario propietario) {
+        return sNotificaciones.obtenerNotificacionesDelPropietario(propietario);
+    }
+
+    public void borrarNotificacionesDelPropietario(Propietario propietario) {
+        sNotificaciones.borrarNotificacionesDelPropietario(propietario);
+    }
+
+  public void enviarNotificacion(Propietario propietario, String mensaje) {
+        if (propietario == null || mensaje == null) {
+            return;
+        }
+        sNotificaciones.agregarNotificacion(mensaje, propietario);
+    }
+
+
     
 
-    public Usuario login(String cedula, String contrasenia) {
-        return sUsuarios.login(cedula, contrasenia);
-    }
-
-    public Propietario buscarPropietarioPorCedula(String cedula) {
-        return sUsuarios.buscarPropietarioPorCedula(cedula);
-    }
-
-    public void asignarBonificacionPropietarios(String cedula, Bonificacion b) throws PeajeException {
-        sUsuarios.asignarBonificacionPropietarios(cedula, b);
-    }
-
-    public void cambiarEstadoPropietario(String cedula, Estado e) throws PeajeException {
-        sUsuarios.cambiarEstadoPropietario(cedula, e);
-    }
-
-    public Administrador buscarAdministradorCedula(String cedula) {
-        return sUsuarios.buscarAdministradorCedula(cedula);
-    }
-
-    public List<Propietario> getPropietarios() {
-        return sUsuarios.listaPropietarios();
-    }
-
-    public List<Administrador> getAdministradores() {
-        return sUsuarios.listaAdministradores();
-    }
-
-    // public ControladorLogin getServicioUsuarios() {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'getServicioUsuarios'");
-    // }
-
-//UTILES PARA LA PRECARGA DE DATOS DESPUES PASASR A LOS SERVICIOS CORRESPONDIENTES
-    public void agregarPuesto(Puesto p) { if (p != null) puestos.add(p); }
-    public void agregarCategoriaVehiculo(CategoriaVehiculo c) { if (c != null) categorias.add(c); }
-    public void agregarTarifa(Tarifa t) { if (t != null) tarifas.add(t); }
-    public void agregarBonificacion(Bonificacion b) { if (b != null) bonificaciones.add(b); }
-    public void agregarEstado(Estado e) { if (e != null) estados.add(e); }
-
-    public List<Puesto> getPuestos() { return new ArrayList<>(puestos); }
-    public List<CategoriaVehiculo> getCategorias() { return new ArrayList<>(categorias); }
-    public List<Tarifa> getTarifas() { return new ArrayList<>(tarifas); }
-    public List<Bonificacion> getBonificaciones() { return new ArrayList<>(bonificaciones); }
-    public List<Estado> getEstados() { return new ArrayList<>(estados); }
-
-
-    // búsqueda simple: tarifa por puesto y categoría (devuelve la primera que coincida)
-    public Tarifa buscarTarifaParaPuestoYCategoria(Puesto puesto, CategoriaVehiculo categoria) {
-        if (puesto == null || categoria == null) return null;
-        for (Tarifa t : tarifas) {
-            if (t.getPuestos().contains(puesto) && t.getCategoriasVehiculos().contains(categoria)) {
-                return t;
-            }
-        }
-        return null;
-    }
 }

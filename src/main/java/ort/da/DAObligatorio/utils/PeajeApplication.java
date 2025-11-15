@@ -1,141 +1,114 @@
 package ort.da.DAObligatorio.utils;
 
-import java.util.Arrays;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import ort.da.DAObligatorio.modelo.*;
-import ort.da.DAObligatorio.servicios.fachada.Fachada;
 import ort.da.DAObligatorio.excepciones.PeajeException;
+import ort.da.DAObligatorio.modelo.bonificaciones.Bonificacion;
+import ort.da.DAObligatorio.modelo.bonificaciones.DescuentoProcentaje;
+import ort.da.DAObligatorio.modelo.bonificaciones.Exonerado;
+import ort.da.DAObligatorio.modelo.bonificaciones.ReglaBonificacion;
+import ort.da.DAObligatorio.modelo.estados.Estado;
+import ort.da.DAObligatorio.modelo.estados.EstadoDeshabilitado;
+import ort.da.DAObligatorio.modelo.peajes.Puesto;
+import ort.da.DAObligatorio.modelo.usuarios.Administrador;
+import ort.da.DAObligatorio.modelo.usuarios.Propietario;
+import ort.da.DAObligatorio.modelo.vehiculos.CategoriaVehiculo;
+import ort.da.DAObligatorio.modelo.vehiculos.Vehiculo;
+import ort.da.DAObligatorio.servicios.fachada.Fachada;
 
 @SpringBootApplication(scanBasePackages = "ort.da.DAObligatorio")
 public class PeajeApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PeajeApplication.class, args);
-
-		cargarDatosDePrueba();
+        try {
+            cargarDatosDePrueba();
+        } catch (PeajeException e) {
+            e.printStackTrace();
+        }
+		
 	}
 
-    private static void cargarDatosDePrueba() {
+    private static void cargarDatosDePrueba() throws PeajeException {
         Fachada f = Fachada.getInstancia();
 
-        // --- Estados ---
-        Estado habilitado = new EstadoHabilitado();
-        Estado deshabilitado = new EstadoDeshabilitado();
-        Estado suspendido = new EstadoSuspendido();
-        Estado penalizado = new EstadoPenalizado();
+        //Categorias de Vehiculos
+        CategoriaVehiculo catAuto = CategoriaVehiculo.AUTOMOVIL;
+        CategoriaVehiculo catCamion = CategoriaVehiculo.CAMION;
+        CategoriaVehiculo catMoto = CategoriaVehiculo.MOTO;
 
-        // Evitar duplicados si vuelves a cargar
-        if (f.getEstados() == null || f.getEstados().stream().noneMatch(e -> "Habilitado".equalsIgnoreCase(e.getNombre())))
-            f.agregarEstado(habilitado);
-        if (f.getEstados() == null || f.getEstados().stream().noneMatch(e -> "Deshabilitado".equalsIgnoreCase(e.getNombre())))
-            f.agregarEstado(deshabilitado);
-        if (f.getEstados() == null || f.getEstados().stream().noneMatch(e -> "Suspendido".equalsIgnoreCase(e.getNombre())))
-            f.agregarEstado(suspendido);
-        if (f.getEstados() == null || f.getEstados().stream().noneMatch(e -> "Penalizado".equalsIgnoreCase(e.getNombre())))
-            f.agregarEstado(penalizado);
+        f.agregarCategoriaVehiculo(catAuto);
+        f.agregarCategoriaVehiculo(catCamion);
+        f.agregarCategoriaVehiculo(catMoto);
 
-        // --- Categorías ---
-        CategoriaVehiculo catAuto = new CategoriaVehiculo("Automóvil");
-        CategoriaVehiculo catCamion = new CategoriaVehiculo("Camión");
-        if (f.getCategorias() == null || f.getCategorias().stream().noneMatch(c -> "Automóvil".equalsIgnoreCase(c.getNombre())))
-            f.agregarCategoriaVehiculo(catAuto);
-        if (f.getCategorias() == null || f.getCategorias().stream().noneMatch(c -> "Camión".equalsIgnoreCase(c.getNombre())))
-            f.agregarCategoriaVehiculo(catCamion);
+        //Puestos o peajes
+        Puesto centro = new Puesto("Puesto Centro", "Av. Central 123");
+        Puesto norte = new Puesto("Puesto Norte", "Av. del norte 123");
+        Puesto sur = new Puesto("Puesto Sur", "Av. del sur 123");
 
-        // --- Puestos ---
-        Puesto puestoCentro = new Puesto("Puesto Centro", "Av. Principal 100");
-        Puesto puestoNorte = new Puesto("Puesto Norte", "Camino Norte 200");
-        if (f.getPuestos() == null || f.getPuestos().stream().noneMatch(p -> "Puesto Centro".equalsIgnoreCase(p.getNombre())))
-            f.agregarPuesto(puestoCentro);
-        if (f.getPuestos() == null || f.getPuestos().stream().noneMatch(p -> "Puesto Norte".equalsIgnoreCase(p.getNombre())))
-            f.agregarPuesto(puestoNorte);
+        f.agregarPuesto(sur);
+        f.agregarPuesto(norte);
+        f.agregarPuesto(centro);
 
-        // --- Tarifas (vincular puesto y categoría) ---
-        // Crear Tarifa y asociar puesto/categoría
-        Tarifa tarifaAutoP1 = new Tarifa(50.0);
-        tarifaAutoP1.getPuestos().add(puestoCentro);
-        tarifaAutoP1.getCategoriasVehiculos().add(catAuto);
-        if (f.getTarifas() == null || f.getTarifas().stream().noneMatch(t -> t.getMonto() == tarifaAutoP1.getMonto() && t.getCategoriasVehiculos().contains(catAuto)))
-            f.agregarTarifa(tarifaAutoP1);
 
-        Tarifa tarifaCamionP1 = new Tarifa(120.0);
-        tarifaCamionP1.getPuestos().add(puestoCentro);
-        tarifaCamionP1.getCategoriasVehiculos().add(catCamion);
-        if (f.getTarifas() == null || f.getTarifas().stream().noneMatch(t -> t.getMonto() == tarifaCamionP1.getMonto() && t.getCategoriasVehiculos().contains(catCamion)))
-            f.agregarTarifa(tarifaCamionP1);
+        //Tarifas
+        f.crearTarifa(sur, catMoto, 120);
+        f.crearTarifa(norte, catAuto, 200);
+        f.crearTarifa(centro, catCamion, 350);  
 
-        Tarifa tarifaAutoP2 = new Tarifa(40.0);
-        tarifaAutoP2.getPuestos().add(puestoNorte);
-        tarifaAutoP2.getCategoriasVehiculos().add(catAuto);
-        if (f.getTarifas() == null || f.getTarifas().stream().noneMatch(t -> t.getMonto() == tarifaAutoP2.getMonto() && t.getPuestos().contains(puestoNorte)))
-            f.agregarTarifa(tarifaAutoP2);
+        //Bonificaciones nombre + reglas
+        ReglaBonificacion reglaExonerados   = new Exonerado();
+        ReglaBonificacion reglaFrecuentes   = new DescuentoProcentaje(50); // 50% desc.
+        ReglaBonificacion reglaTrabajadores = new DescuentoProcentaje(20); // 20% desc.
 
-        // --- Bonificaciones ---
-        Bonificacion exonerados = new Bonificacion("Exonerados");
-        Bonificacion frecuentes = new Bonificacion("Frecuentes");
-        Bonificacion trabajadores = new Bonificacion("Trabajadores");
-        if (f.getBonificaciones() == null || f.getBonificaciones().stream().noneMatch(b -> "Exonerados".equalsIgnoreCase(b.getNombre())))
-            f.agregarBonificacion(exonerados);
-        if (f.getBonificaciones() == null || f.getBonificaciones().stream().noneMatch(b -> "Frecuentes".equalsIgnoreCase(b.getNombre())))
-            f.agregarBonificacion(frecuentes);
-        if (f.getBonificaciones() == null || f.getBonificaciones().stream().noneMatch(b -> "Trabajadores".equalsIgnoreCase(b.getNombre())))
-            f.agregarBonificacion(trabajadores);
 
-        // --- Administradores ---
-        Administrador admin1 = new Administrador("12345678", "admin.123", "Usuario Administrador", null, null);
-        Administrador admin2 = new Administrador("87654321", "admin2.123", "Administrador 2", null, null);
-        if (f.getAdministradores() == null || f.getAdministradores().stream().noneMatch(a -> "12345678".equals(a.getCedula())))
-            f.agregarAdministrador(admin1);
-        if (f.getAdministradores() == null || f.getAdministradores().stream().noneMatch(a -> "87654321".equals(a.getCedula())))
-            f.agregarAdministrador(admin2);
+        Bonificacion exonerados   = new Bonificacion("Exonerados",   reglaExonerados);
+        Bonificacion frecuentes   = new Bonificacion("Frecuentes",   reglaFrecuentes);
+        Bonificacion trabajadores = new Bonificacion("Trabajadores", reglaTrabajadores);
 
-        // --- Vehículos y Propietarios ---
+        f.agregarBonificacion(exonerados);
+        f.agregarBonificacion(frecuentes);
+        f.agregarBonificacion(trabajadores);
+
+        //vehiculos
         Vehiculo v1 = new Vehiculo("ABC123", "ModeloX", "Rojo", catAuto);
         Vehiculo v2 = new Vehiculo("DEF456", "ModeloY", "Azul", catCamion);
 
+        f.agregarVehiculo(v1);
+        f.agregarVehiculo(v2);
+
+        //Propietarios uno con estado deshabilitado para la prueba
+
+        
+        Estado estadoDeshabilitado = new EstadoDeshabilitado();
+
         Propietario prop1 = new Propietario(
-            "23456789",
-            "prop.123",
-            "Usuario Propietario",
-            2000.0,
-            500.0,
-            Arrays.asList(v1),
-            deshabilitado
-        );
+                "23456789",
+                "prop.123",
+                "Usuario Propietario",
+                2000,
+                500);
+
         Propietario prop2 = new Propietario(
-            "2",
-            "prop2.123",
-            "Propietario Dos",
-            1000.0,
-            200.0,
-            Arrays.asList(v2),
-            habilitado
-        );
+                "23456788",
+                "prop.1234",
+                "Usuario Propietario Des",
+                2000,
+                500);
+        prop2.setEstado(estadoDeshabilitado);
 
-        try {
-            // Fachada/ServicioUsuarios valida matrículas duplicadas y lanza PeajeException si corresponde
-            if (f.buscarPropietarioPorCedula(prop1.getCedula()) == null) f.agregarPropietario(prop1);
-            if (f.buscarPropietarioPorCedula(prop2.getCedula()) == null) f.agregarPropietario(prop2);
-        } catch (PeajeException e) {
-            // imprimir para debug, no interrumpir arranque
-            e.printStackTrace();
-        }
+        f.agregarPropietario(prop1);
+        f.agregarPropietario(prop2);
 
-        // DEBUG: resumen rápido
-        try {
-            int nProps = f.getPropietarios() == null ? 0 : f.getPropietarios().size();
-            int nPuestos = f.getPuestos() == null ? 0 : f.getPuestos().size();
-            int nTarifas = f.getTarifas() == null ? 0 : f.getTarifas().size();
-            int nBon = f.getBonificaciones() == null ? 0 : f.getBonificaciones().size();
-            int nCats = f.getCategorias() == null ? 0 : f.getCategorias().size();
-            int nEst = f.getEstados() == null ? 0 : f.getEstados().size();
-            System.out.println("[DEBUG] Precarga: propietarios=" + nProps + " puestos=" + nPuestos + " tarifas=" + nTarifas + " bonificaciones=" + nBon + " categorias=" + nCats + " estados=" + nEst);
-        } catch (Exception e) {
-            // si alguno de los getters no existe, mostrar al menos la confirmación de ejecución
-            System.out.println("[DEBUG] Precarga ejecutada (no se pudo leer conteos desde Fachada).");
-        }
+        //administrador
+
+        Administrador admin1 = new Administrador(
+            "12345678",
+            "admin.123",
+            "Usuario Administrador");
+
+        f.agregarAdministrador(admin1);
     }
 }

@@ -31,11 +31,11 @@ public class Respuesta {
         this.parametro = parametro;
     }
     
+    
     public static List<Respuesta> lista(Respuesta... respuestas){
-         List<Respuesta> retorno = new ArrayList<Respuesta>();
-         for(Respuesta r:respuestas){
-             retorno.add(r);
-         }
-         return retorno;
-    }
+    List<Respuesta> retorno = new ArrayList<>();
+    for (Respuesta r : respuestas) retorno.add(r);
+    return retorno;
+}
+
 }

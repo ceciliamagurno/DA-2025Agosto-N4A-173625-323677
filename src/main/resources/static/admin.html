@@ -9,8 +9,29 @@
 <body>
     <div class="container">
         <h1>Área Administrador</h1>
-        <p>Bienvenido administrador. Aquí irán las herramientas administrativas.</p>
-        <p><a href="index.html">Cerrar sesión / Volver al inicio</a></p>
+        <p>Bienvenido administrador. Seleccione una acción:</p>
+
+        <div class="admin-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-top:18px;">
+            <div class="card">
+                <h3>1. Emular tránsito</h3>
+                <p>Registrar manualmente un tránsito.</p>
+                <p><a class="btn" href="emularTransito.html">Ir a Emular Tránsito</a></p>
+            </div>
+
+            <div class="card">
+                <h3>2. Asignar bonificaciones</h3>
+                <p>Asignar bonificaciones a un propietario.</p>
+                <p><a class="btn" href="asignarBonificaciones.html">Ir a Asignar Bonificaciones</a></p>
+            </div>
+
+            <div class="card">
+                <h3>3. Cambiar estado actual</h3>
+                <p>Cambiar el estado de un propietario.</p>
+                <p><a class="btn primary" href="cambiarEstado.html">Ir a Cambiar Estado</a></p>
+            </div>
+        </div>
+
+        <p style="margin-top:22px;"><a href="index.html">Cerrar sesión / Volver al inicio</a></p>
     </div>
 </body>
 </html>
