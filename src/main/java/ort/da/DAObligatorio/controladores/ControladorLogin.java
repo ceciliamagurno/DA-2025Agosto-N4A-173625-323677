@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpSession;
 import ort.da.DAObligatorio.excepciones.PeajeException;
+import ort.da.DAObligatorio.modelo.Sesion;
 import ort.da.DAObligatorio.modelo.usuarios.Administrador;
 import ort.da.DAObligatorio.modelo.usuarios.Propietario;
 import ort.da.DAObligatorio.modelo.usuarios.Usuario;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequestMapping("/login")
 public class ControladorLogin {
 
+    private final Fachada f = Fachada.getInstancia();
+
 
     @PostMapping("/login")
     public List<Respuesta> login(HttpSession sesionHttp, 
@@ -26,7 +29,7 @@ public class ControladorLogin {
                                 @RequestParam String contrasenia) throws PeajeException {
         
                                     // Intentamos autenticar el usuario
-        Usuario usuarioLogueado  = Fachada.getInstancia().login(cedula, contrasenia);
+        Usuario usuarioLogueado  = f.login(cedula, contrasenia);
         if (usuarioLogueado == null) {
             throw new PeajeException("Acceso denegado");
         }
@@ -39,7 +42,9 @@ public class ControladorLogin {
             }
         }
         // Guardamos el usuario en la sesión 
-        sesionHttp.setAttribute("UsuarioConectado", usuarioLogueado);
+        Sesion sesion = new Sesion(usuarioLogueado);
+        sesionHttp.setAttribute("sesion", sesion);
+        
 
         // Redirigimos según tipo de usuario
         if (usuarioLogueado instanceof Administrador) {

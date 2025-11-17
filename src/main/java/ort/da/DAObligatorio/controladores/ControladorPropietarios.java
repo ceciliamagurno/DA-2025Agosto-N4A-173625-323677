@@ -21,7 +21,7 @@ public class ControladorPropietarios {
     @GetMapping("/lista")
     public List<Respuesta> listarPropietarios() {
         List<PropietarioDto> propietariosDto = new ArrayList<>();
-        for (Propietario p : f.getPropietarios()) {
+        for (Propietario p : f.listarPropietarios()) {
             propietariosDto.add(new PropietarioDto(p));
         }
         return Respuesta.lista(new Respuesta("propietarios", propietariosDto));

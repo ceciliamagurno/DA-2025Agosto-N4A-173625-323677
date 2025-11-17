@@ -103,7 +103,7 @@ public class Fachada extends Observable{
         return sEstados.obtenerEstadosDisponibles();
     }
 
-     public void cambiarEstadoPropietario(String cedula, String nombreEstado) throws PeajeException {
+    public void cambiarEstadoPropietario(String cedula, String nombreEstado) throws PeajeException {
         if (cedula == null || nombreEstado == null) {
             throw new PeajeException("Debe indicar cédula y estado.");
         }
@@ -161,6 +161,8 @@ public class Fachada extends Observable{
         ev[0] = propietario;
         ev[1] = "ASIGNACION_BONIFICACION";
         ev[2] = b.getNombre();
+
+        this.avisar(ev);
     }
 
     public List<AsignacionDeBonificacion> obtenerAsignacionesPorPropietario(Propietario propietario) {
@@ -182,10 +184,6 @@ public class Fachada extends Observable{
         return sTransitos.getTransitos();
     }
 
-    public Transito registrarTransito(Vehiculo vehiculo, Puesto puesto, Tarifa tarifa, Propietario propietario,
-            List<AsignacionDeBonificacion> asignaciones, LocalDateTime fechaHora) throws PeajeException {
-        return sTransitos.registrarTransito(vehiculo, puesto, tarifa, propietario, asignaciones, fechaHora);
-    }
 
     public List<Transito> obtenerTransitosPorPropietario(Propietario p) {
         return sTransitos.obtenerTransitosPorPropietario(p);

@@ -67,11 +67,11 @@ public class ControladorTransitos {
                 }
             }
         }
-        return Respuesta.lista(new Respuesta("Tarifas", resultado));
+        return Respuesta.lista(new Respuesta("tarifas", resultado));
     }
 
 
-    @PostMapping("path")
+    @PostMapping("/emular")
     public List<Respuesta> emularTransito(@RequestParam String nombrePuesto,
                                         @RequestParam String matricula,
                                         @RequestParam (required = false) String fechaHoraString) {

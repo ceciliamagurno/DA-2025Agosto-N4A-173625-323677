@@ -16,6 +16,7 @@ import ort.da.DAObligatorio.dtos.TransitoDto;
 import ort.da.DAObligatorio.modelo.usuarios.Propietario;
 import ort.da.DAObligatorio.modelo.usuarios.Usuario;
 import ort.da.DAObligatorio.modelo.vehiculos.Vehiculo;
+import ort.da.DAObligatorio.modelo.Sesion;
 import ort.da.DAObligatorio.modelo.peajes.AsignacionDeBonificacion;
 import ort.da.DAObligatorio.modelo.peajes.Notificacion;
 import ort.da.DAObligatorio.modelo.peajes.Transito;
@@ -29,13 +30,15 @@ public class ControladorTableroPropietario {
     private final Fachada f = Fachada.getInstancia();
 
     @GetMapping("/vistaConectada")
-    public List<Respuesta> vistaConectada (
-        @SessionAttribute(name = "UsuarioConectado", required = false) Usuario usuarioConectado) {
+    public List<Respuesta> inicializarVista (
+        @SessionAttribute(name = "sesion", required = false) Sesion sesion) {
 
         //Sin sesión "usuarioNoAutenticado" y vamos al lgin
-        if (usuarioConectado == null) {
+        if (sesion == null) {
             return Respuesta.lista(new Respuesta("usuarioNoAutenticado", "login.html"));
         }
+
+        Usuario usuarioConectado = sesion.getUsuario();
 
         //no es propietario, mensaje simple
         if (!(usuarioConectado instanceof Propietario)) {
@@ -79,31 +82,31 @@ public class ControladorTableroPropietario {
         dto.setTransitos(transitosDto);
         dto.setCantidadTransitos(transitosDto.size());
 
-    //Bonificaciones del propietario
-    List<BonificacionDto> bonificacionesDto = new ArrayList<BonificacionDto>();
-    List<AsignacionDeBonificacion> asignaciones = f.obtenerAsignacionesPorPropietario(propietario);
+        //Bonificaciones del propietario
+        List<BonificacionDto> bonificacionesDto = new ArrayList<BonificacionDto>();
+        List<AsignacionDeBonificacion> asignaciones = f.obtenerAsignacionesPorPropietario(propietario);
 
-    if(asignaciones!= null){
-        for(AsignacionDeBonificacion a : asignaciones){
-            bonificacionesDto.add(new BonificacionDto(a));
-        }
-    }
-    dto.setBonificaciones(bonificacionesDto);
-
-    //Noticicaciones
-    List<NotificacionDto> notisDto = new ArrayList<NotificacionDto>();
-    List<Notificacion> notificacionessModelo = f.obtenerNotificacionesDelPropietario(propietario);
-
-    if (notificacionessModelo != null) {
-            for (Notificacion n : notificacionessModelo) {
-                notisDto.add(new NotificacionDto(n));
+        if(asignaciones!= null){
+            for(AsignacionDeBonificacion a : asignaciones){
+                bonificacionesDto.add(new BonificacionDto(a));
             }
         }
-        dto.setNotificaciones(notisDto);
+        dto.setBonificaciones(bonificacionesDto);
+
+        //Noticicaciones
+        List<NotificacionDto> notisDto = new ArrayList<NotificacionDto>();
+        List<Notificacion> notificacionessModelo = f.obtenerNotificacionesDelPropietario(propietario);
+
+        if (notificacionessModelo != null) {
+                for (Notificacion n : notificacionessModelo) {
+                    notisDto.add(new NotificacionDto(n));
+                }
+            }
+            dto.setNotificaciones(notisDto);
 
 
-       //devuelvo el dto armado
-    return Respuesta.lista(new Respuesta("tableroPropietario", dto));
+        //devuelvo el dto armado
+        return Respuesta.lista(new Respuesta("tableroPropietario", dto));
 
 
     }
