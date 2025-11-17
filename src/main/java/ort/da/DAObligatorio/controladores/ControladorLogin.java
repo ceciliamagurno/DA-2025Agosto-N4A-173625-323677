@@ -17,7 +17,7 @@ import ort.da.DAObligatorio.utils.Respuesta;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/acceso")
 public class ControladorLogin {
 
     private final Fachada f = Fachada.getInstancia();

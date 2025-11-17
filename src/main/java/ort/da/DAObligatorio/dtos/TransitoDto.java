@@ -2,31 +2,37 @@ package ort.da.DAObligatorio.dtos;
 
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import ort.da.DAObligatorio.modelo.peajes.Transito;
 
 public class TransitoDto {
-    public LocalDateTime fechaHora;
+    public String fechaHora;
     public String puesto;
     public String matricula;
     public String bonificacion;
     public double montoFinal;
 
+    private static final DateTimeFormatter FORMATTER =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+
     public TransitoDto(Transito transito){
-        this.fechaHora = transito.getFechaHora();
+        this.fechaHora = transito.getFechaHora().format(FORMATTER);
         this.puesto = transito.getPuesto().getNombre();
         this.matricula = transito.getMatricula();
         this.bonificacion = transito.getBonificacionAplicada();
+        this.montoFinal = transito.getMontoCobrado();
     }
 
     public TransitoDto(){}
 
     
-    public LocalDateTime getFechaHora() {
+    public String getFechaHora() {
         return fechaHora;
     }
 
-    public void setFechaHora(LocalDateTime fechaHora) {
+    public void setFechaHora(String fechaHora) {
         this.fechaHora = fechaHora;
     }
 

@@ -1,5 +1,7 @@
 package ort.da.DAObligatorio.dtos;
 
+import java.time.format.DateTimeFormatter;
+
 import ort.da.DAObligatorio.modelo.peajes.AsignacionDeBonificacion;
 
 public class BonificacionDto {
@@ -8,12 +10,16 @@ public class BonificacionDto {
     public String tipoRegla;
     public String fechaAsignacion;
 
+
+    private static final DateTimeFormatter FORMATTER =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
     public BonificacionDto(AsignacionDeBonificacion a) {
         if(a != null){
             this.nombre = a.getBonificacion().getNombre();
             this.puesto = a.getPuesto().getNombre();
             this.tipoRegla = a.getBonificacion().getNombre();
-            this.fechaAsignacion = a.getFechaAlta().toString();
+            this.fechaAsignacion = a.getFechaAlta().format(FORMATTER);
         }
     }
 

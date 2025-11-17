@@ -1,6 +1,8 @@
 package ort.da.DAObligatorio.utils;
 
 
+import java.time.LocalDateTime;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -11,6 +13,7 @@ import ort.da.DAObligatorio.modelo.bonificaciones.Exonerado;
 import ort.da.DAObligatorio.modelo.bonificaciones.ReglaBonificacion;
 import ort.da.DAObligatorio.modelo.estados.Estado;
 import ort.da.DAObligatorio.modelo.estados.EstadoDeshabilitado;
+import ort.da.DAObligatorio.modelo.peajes.AsignacionDeBonificacion;
 import ort.da.DAObligatorio.modelo.peajes.Puesto;
 import ort.da.DAObligatorio.modelo.usuarios.Administrador;
 import ort.da.DAObligatorio.modelo.usuarios.Propietario;
@@ -72,6 +75,9 @@ public class PeajeApplication {
         f.agregarBonificacion(frecuentes);
         f.agregarBonificacion(trabajadores);
 
+
+       
+
         //vehiculos
         Vehiculo v1 = new Vehiculo("ABC123", "ModeloX", "Rojo", catAuto);
         Vehiculo v2 = new Vehiculo("DEF456", "ModeloY", "Azul", catCamion);
@@ -87,9 +93,15 @@ public class PeajeApplication {
         Propietario prop1 = new Propietario(
                 "23456789",
                 "prop.123",
-                "Usuario Propietario",
+                "Usuario Propietario Juan",
                 2000,
                 500);
+                prop1.agregarVehiculo(v1);
+                
+
+       
+
+
 
         Propietario prop2 = new Propietario(
                 "23456788",
@@ -98,9 +110,16 @@ public class PeajeApplication {
                 2000,
                 500);
         prop2.setEstado(estadoDeshabilitado);
+        
 
         f.agregarPropietario(prop1);
         f.agregarPropietario(prop2);
+
+
+        f.asignarBonificacionAPropietario(prop1, trabajadores, sur);
+        f.registrarTransito(v1.getMatricula(),norte.getNombre(), LocalDateTime.now().minusDays(1));
+        f.registrarTransito(v1.getMatricula(), norte.getNombre(),  LocalDateTime.now().minusHours(5));
+        f.registrarTransito(v1.getMatricula(), norte.getNombre(),  LocalDateTime.now().minusMinutes(30));
 
         //administrador
 

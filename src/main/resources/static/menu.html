@@ -1,139 +1,188 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tablero - Propietario</title>
+  <title>Tablero del Propietario</title>
+
   <link rel="stylesheet" href="styles.css">
-  <style>
-    .top-row { display:flex;justify-content:space-between;align-items:center;margin:1rem 0;gap:12px; }
-    .logo-box{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#7c3aed);box-shadow:0 6px 18px rgba(11,22,39,0.06);}
-    .title { font-size:1.15rem;font-weight:700; }
-    .right-actions { text-align:right; color:var(--muted); }
-    @media (max-width:960px){ .grid-layout{grid-template-columns:1fr} }
-    .resumen-row{display:flex;gap:12px;margin-bottom:12px}
-    .res-box{flex:1;padding:12px;border-radius:8px;background:var(--card);border:1px solid rgba(15,23,42,0.03)}
-    .panel-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-    table.small{width:100%;border-collapse:collapse;font-size:14px}
-    table.small th, table.small td{padding:8px 10px;text-align:left;border-bottom:1px solid #eef2ff}
-    .badge {display:inline-block;padding:6px 10px;border-radius:999px;background:#fbfbff;color:var(--muted);font-weight:600;font-size:12px;border:1px solid #eef2ff} */
-  </style> 
   <script src="vistaWeb.js"></script>
 </head>
+
 <body>
   <script src="utilesVista.js"></script>
+
   <div class="container">
+
+    <!-- HEADER -->
     <div class="top-row">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="logo-box" aria-hidden="true"></div>
+      <div class="flex items-center gap-12">
+        <div class="logo-box"></div>
+
         <div>
-          <div class="title">Tablero de control del propietario</div>
+          <div class="title">Tablero del propietario</div>
           <div class="menu-desc">Resumen y actividad</div>
         </div>
       </div>
+
       <div class="right-actions">
         <div>Bienvenido, <strong id="nombreMini">Propietario</strong></div>
-        <div style="margin-top:6px"><a href="index.html" class="btn ghost">Salir</a></div>
+        <div class="mt-1">
+          <a href="login.html" class="btn ghost">Salir</a>
+        </div>
       </div>
     </div>
 
+
+    <!-- LAYOUT PRINCIPAL -->
     <div class="grid-layout">
-      <!-- columna principal -->
+
       <main>
-        <div class="card">
-          <div class="resumen-row">
-            <div class="res-box">
-              <div class="small-muted">NOMBRE COMPLETO</div>
-              <div id="nombreProp" style="margin-top:6px;font-weight:700">Juan Pérez</div>
-            </div>
-            <div class="res-box">
-              <div class="small-muted">ESTADO</div>
-              <div id="estadoProp" style="margin-top:6px;font-weight:700">Activo</div>
-            </div>
-            <div class="res-box">
-              <div class="small-muted">SALDO ACTUAL</div>
-              <div id="saldoProp" style="margin-top:6px;font-weight:700">$ 2.540,00</div>
-            </div>
+
+        <!-- RESUMEN SUPERIOR -->
+        
+        <div class="resumen-row">
+
+          <div class="res-box res-box-horizontal">
+            <span class="small-muted">NOMBRE COMPLETO</span>
+            <span id="nombreProp" class="res-value"></span>
           </div>
 
-          <div style="display:flex;gap:12px;flex-wrap:wrap">
-            <div style="flex:1;min-width:260px" class="card">
+          <div class="res-box res-box-horizontal">
+            <span class="small-muted">ESTADO</span>
+            <span id="estadoProp" class="res-value"></span>
+          </div>
+
+          <div class="res-box res-box-horizontal">
+            <span class="small-muted">SALDO ACTUAL</span>
+            <span id="saldoProp" class="res-value"></span>
+          </div>
+
+        </div>
+
+        
+          <div class="card">
+          <!-- VEHÍCULOS Y BONIFICACIONES -->
+          
+
+          <div class="card">
               <div class="panel-title">
-                <strong>Vehículos registrados</strong>
-                <span class="small-muted">Matrículas</span>
+                <h3>Vehículos registrados</h3>
               </div>
               <div id="vehiculosDiv"></div>
-            </div>
-
-            <div style="width:320px" class="card">
-              <div class="panel-title">
-                <strong>Bonificaciones asignadas</strong>
-                <span class="small-muted">Resumen</span>
-              </div>
-              <div id="bonificacionesDiv"></div>
-            </div>
           </div>
 
-          <div class="transitos" style="margin-top:16px">
+
+          <div class="card">
             <div class="panel-title">
-              <strong>Transitos</strong>
-              <span class="small-muted">Resumen</span>
+              <h3>Bonificaciones asignadas</h3>
             </div>
+            <div id="bonificacionesDiv"></div>
+          </div>
+
+          
+          </div>
+
+
+          <!-- TRÁNSITOS -->
+          <div class="card width-320 mt-1">
+            <div class="panel-title">
+              <h3>Historial de tránsitos</h3>
+            </div>
+
             <div id="transitosDiv"></div>
           </div>
 
         </div>
 
-        <div class="card" style="margin-top:12px">
+
+        <!-- NOTIFICACIONES -->
+        <div class="card mt-1">
+
           <div class="panel-title">
             <strong>Notificaciones del sistema</strong>
-            <div class="actions"><button class="btn btn" onclick="borrarNotificaciones()">Borrar notificaciones</button></div>
+            <button class="btn ghost" onclick="borrarNotificaciones()">Borrar</button>
           </div>
-          <ul id="notificacionesList" style="margin:0;padding-left:16px;color:var(--muted)">
-            <li>Saldo bajo: su saldo quedó por debajo del mínimo de alerta.</li>
-            <li>Bonificación Frecuente asignada para Peaje Norte.</li>
-          </ul>
+
+          <ul id="notificacionesList" class="notif-list"></ul>
+
         </div>
+
       </main>
+
     </div>
   </div>
 
+
   <script>
-    urlIniciarVista = '/tablero/vistaConectada';
-    parametrosIniciovista = '';
-    function procesarRespuestaSubmit(text) {
-  let json;
-  try {
-    json = JSON.parse(text);
-  } catch (e) {
-    console.error("Error parseando JSON:", e, text);
-    return;
-  }
 
-  // Si es una lista, tomá el primer elemento
-  if (Array.isArray(json)) {
-    json = json[0];
-  }
-
-  if (json.id === "propietarios" && Array.isArray(json.parametro)) {
-    mostrar_propietarios(json.parametro[0]);
-  }
-}
-
-    // cosas del DOM
-    function mostrar_propietarios(datos){
-      console.log("Datos recibidos:", datos);
-      document.getElementById('nombreMini').textContent = datos.nombreCompleto;
-      document.getElementById('nombreProp').textContent = datos.nombreCompleto;
-      document.getElementById('estadoProp').textContent = datos.estado;
-      document.getElementById('saldoProp').textContent = formatearMoneda(datos.saldoActual);
-      document.getElementById('vehiculosDiv').innerHTML = crearTablaDesdeJson(datos.vehiculos);
-      document.getElementById('bonificacionesDiv').innerHTML = crearTablaDesdeJson(datos.bonificaciones);
+    urlIniciarVista = "/tablero/vistaConectada";
+    parametrosIniciovista = "";
 
     
+    function mostrar_usuarioNoAutenticado(urlDestino){
+        window.location.href = urlDestino;
+    }
+
+    async function mostrar_mensaje(texto) {
+        await mostrarMensaje(texto);
+    }
+
+    async function excepcionDeAplicacion(mensaje) {
+        await mostrarMensaje(mensaje);
+    }
+
+     function procesarErrorSubmit(status, text) {
+        mostrarMensaje("Error (" + status + "): " + text);
+    }
+
+       function borrarNotificaciones() {
+        document.getElementById("notificacionesList").innerHTML = "";
+    }
+
+    //renderizar la vista al cargar la página
+    function mostrar_tableroPropietario(dto) {
+      console.log("DTO recibido:", dto);
+        
+
+      document.getElementById("nombreMini").textContent = dto.nombreCompleto;
+      document.getElementById("nombreProp").textContent = dto.nombreCompleto;
+      document.getElementById("estadoProp").textContent = dto.estado;
+      document.getElementById("saldoProp").textContent = dto.saldoActual;
+
+      document.getElementById("vehiculosDiv").innerHTML = crearTablaDesdeJson(dto.vehiculos || []);
+
+      document.getElementById("bonificacionesDiv").innerHTML = crearTablaDesdeJson(dto.bonificaciones || []);
+      
+      document.getElementById("transitosDiv").innerHTML = crearTablaDesdeJson(dto.transitos || []);
+
+      const ul = document.getElementById("notificacionesList");
+      ul.innerHTML = "";
+
+      if (dto.notificaciones) {
+        for (const n of dto.notificaciones) {
+          const li = document.createElement("li");
+          li.textContent = n.mensaje;
+          ul.appendChild(li);
+        }
+      }
+
+      document.getElementById("vehiculosDiv").innerHTML =
+          crearTablaDesdeJson(dto.vehiculos);
+
+      document.getElementById("bonificacionesDiv").innerHTML =
+          crearTablaDesdeJson(dto.bonificaciones);
+
+      document.getElementById("transitosDiv").innerHTML =
+          crearTablaDesdeJson(dto.transitos || []);
+
     }
 
 
+
+
   </script>
+
 </body>
 </html>

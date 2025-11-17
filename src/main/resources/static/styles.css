@@ -17,6 +17,7 @@ body{
   -moz-osx-font-smoothing:grayscale;
 }
 
+
 .container{
   max-width:1000px;
   margin:0 auto;
@@ -125,5 +126,79 @@ body{
   .menu-item {
     min-width: 220px;
     max-width: 95vw;
+
+
   }
+}
+
+
+
+/* Tablas generadas por crearTablaDesdeJson */
+table[id^="tabla-json-"] {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+table[id^="tabla-json-"] thead th {
+  text-align: left;
+  padding: 0.5rem 1.2rem;   
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+table[id^="tabla-json-"] tbody td {
+  padding: 0.55rem 1.2rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+table[id^="tabla-json-"] tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+.res-box-horizontal {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;        
+}
+
+.res-box-horizontal .small-muted {
+  margin: 0;
+}
+
+.res-box-horizontal .res-value {
+  margin-top: 0;    
+}
+
+
+
+.top-row {
+  display: flex;
+  justify-content: space-between;  /* izquierda y derecha separadas */
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.right-actions {
+  text-align: right;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.gap-12 {
+  gap: 12px;
+}
+
+.mt-1 {
+  margin-top: 0.75rem;
 }

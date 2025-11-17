@@ -1,7 +1,9 @@
 package ort.da.DAObligatorio.controladores;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +15,7 @@ import ort.da.DAObligatorio.dtos.NotificacionDto;
 import ort.da.DAObligatorio.dtos.PorpietarioTableroDto;
 
 import ort.da.DAObligatorio.dtos.TransitoDto;
+import ort.da.DAObligatorio.dtos.VehiculoTableroDto;
 import ort.da.DAObligatorio.modelo.usuarios.Propietario;
 import ort.da.DAObligatorio.modelo.usuarios.Usuario;
 import ort.da.DAObligatorio.modelo.vehiculos.Vehiculo;
@@ -55,32 +58,46 @@ public class ControladorTableroPropietario {
 
 
         //cantidad de vehiculos registrados
-       List<Vehiculo> vehiculos = propietario.getVehiculos();
-       int cantidadVehiculos = (vehiculos == null) ? 0 : vehiculos.size();
-       dto.setCantidadVehiculos(cantidadVehiculos);
+        List<Vehiculo> vehiculos = propietario.getVehiculos();
+        List<VehiculoTableroDto> vehiculosDto = new ArrayList<>();
+        Map<String, VehiculoTableroDto> vehiculosPorMatricula = new HashMap<>();
 
-
-       List<String> matriculas = new ArrayList<String>();
-       if(vehiculos != null){
-            for(Vehiculo v : vehiculos){
-                if(v !=null && v.getMatricula() != null){
-                    matriculas.add(v.getMatricula());
+        if (vehiculos != null) {
+            for (Vehiculo v : vehiculos) {
+                if (v != null) {
+                    VehiculoTableroDto vDto = new VehiculoTableroDto(v);
+                    vehiculosDto.add(vDto);
+                    vehiculosPorMatricula.put(v.getMatricula(), vDto);
                 }
             }
         }
-        dto.setMatriculas(matriculas);
 
-        //Transitos realizados por el propietario
-        List<TransitoDto> transitosDto = new ArrayList<TransitoDto>();
+        dto.setVehiculos(vehiculosDto);
+        dto.setCantidadVehiculos(vehiculosDto.size());
+
+        
         List<Transito> transitosModelo = f.obtenerTransitosPorPropietario(propietario);
+        List<TransitoDto> transitosDto = new ArrayList<TransitoDto>();
 
-        if(transitosModelo != null){
-            for(Transito t : transitosModelo){
-               transitosDto.add(new TransitoDto(t)); 
+        if (transitosModelo != null) {
+            for (Transito t : transitosModelo) {
+                transitosDto.add(new TransitoDto(t));
+
+                // acumular datos en el DTO del vehículo
+                String mat = t.getMatricula();
+                if(mat != null){
+                    VehiculoTableroDto vDto = vehiculosPorMatricula.get(mat);
+                    if (vDto != null) {
+                        vDto.setCantidadTransitos(vDto.getCantidadTransitos() + 1);
+                        vDto.setTotalGastado(vDto.getTotalGastado() + t.getMontoCobrado());
+                    }
+                }
             }
         }
+
         dto.setTransitos(transitosDto);
         dto.setCantidadTransitos(transitosDto.size());
+
 
         //Bonificaciones del propietario
         List<BonificacionDto> bonificacionesDto = new ArrayList<BonificacionDto>();

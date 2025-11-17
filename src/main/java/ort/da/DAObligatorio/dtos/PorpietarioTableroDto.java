@@ -11,7 +11,7 @@ public class PorpietarioTableroDto {
     private int cantidadVehiculos;
     private int cantidadTransitos;
 
-    private List<String> matriculas = new ArrayList<String>();
+    private List<VehiculoTableroDto> vehiculos = new ArrayList<VehiculoTableroDto>();
     private List<TransitoDto> transitos = new ArrayList<TransitoDto>();
     private List<BonificacionDto> bonificaciones = new ArrayList<BonificacionDto>();
     private List<NotificacionDto> notificaciones = new ArrayList<NotificacionDto>();
@@ -21,7 +21,7 @@ public class PorpietarioTableroDto {
 
     
     public PorpietarioTableroDto(String nombreCompleto, String estado, double saldoActual, double saldoMinimoAlerta,
-            int cantidadVehiculos, int cantidadTransitos, List<String> matriculas, List<TransitoDto> transitos,
+            int cantidadVehiculos, int cantidadTransitos, List<VehiculoTableroDto> vehiculos, List<TransitoDto> transitos,
             List<BonificacionDto> bonificaciones, List<NotificacionDto> notificaciones) {
         this.nombreCompleto = nombreCompleto;
         this.estado = estado;
@@ -29,7 +29,7 @@ public class PorpietarioTableroDto {
         this.saldoMinimoAlerta = saldoMinimoAlerta;
         this.cantidadVehiculos = cantidadVehiculos;
         this.cantidadTransitos = cantidadTransitos;
-        this.matriculas = matriculas;
+        this.vehiculos = vehiculos;
         this.transitos = transitos;
         this.bonificaciones = bonificaciones;
         this.notificaciones = notificaciones;
@@ -85,12 +85,12 @@ public class PorpietarioTableroDto {
         this.cantidadTransitos = cantidadTransitos;
     }
 
-    public List<String> getMatriculas() {
-        return matriculas;
+    public List<VehiculoTableroDto> getVehiculos() {
+        return vehiculos;
     }
 
-    public void setMatriculas(List<String> matriculas) {
-        this.matriculas = matriculas;
+    public void setVehiculos(List<VehiculoTableroDto> vehiculos) {
+        this.vehiculos = vehiculos;
     }
 
     public List<TransitoDto> getTransitos() {

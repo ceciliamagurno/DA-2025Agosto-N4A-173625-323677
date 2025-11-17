@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Propietario</title>
+    <title>Login</title>
     <link rel="stylesheet" href="styles.css">
     <script src="vistaWeb.js"></script>
 </head>
@@ -11,11 +11,11 @@
     <script src="utilesVista.js"></script>
     <div class="container">
         <div class="card" style="max-width:480px;margin:3rem auto;text-align:center;">
-            <h1 class="brand">Login - Propietario</h1>
+            <h1 class="brand">Ingreso a la aplicación</h1>
             <p class="menu-desc">Ingrese su cédula y contraseña</p>
 
-            <form id="formLogin" onsubmit="event.preventDefault(); enviarLogin();" style="display:flex;flex-direction:column;gap:0.6rem;align-items:stretch;">
-                <input type="text" id="cedula" name="cedula" placeholder="Cédula" required style="padding:0.6rem;border:1px solid #e6e9ef;border-radius:6px;" />
+            <form id="formLogin" onsubmit="enviarLogin(event);" style="display:flex;flex-direction:column;gap:0.6rem;align-items:stretch;">
+                <input type="text" id="cedula" name="cedula" placeholder="Cédula, sin puntos ni guiones" required style="padding:0.6rem;border:1px solid #e6e9ef;border-radius:6px;" />
                 <input type="password" id="contrasenia" name="contrasenia" placeholder="Contraseña" required style="padding:0.6rem;border:1px solid #e6e9ef;border-radius:6px;" />
 
                 <button type="submit" class="btn">Ingresar</button>
@@ -28,22 +28,25 @@
     
     
     <script>
-        function enviarLogin(){
+        function enviarLogin(event){
             event.preventDefault();
-            submit('/login/login', serializarFormulario('formLogin'));
+            submit('/acceso/login', serializarFormulario('formLogin'));
         }
 
          function mostrar_loginExitoso(parametro){
-            // parametro es la página a la que redirigir
             window.location.href = parametro;
         }
 
         async function excepcionDeAplicacion(mensaje){
-            await mostrar_error('Error: ' + mensaje);
+            await mostrarMensaje(mensaje);
         }
 
         async function mostrar_error(mensaje) {
             await mostrarMensaje(mensaje);
+        }
+
+        function procesarErrorSubmin(status, textoError){
+                mostrar_error("Error inesperado: (" + status +"): "+ textoError);
         }
     </script>
 </body>

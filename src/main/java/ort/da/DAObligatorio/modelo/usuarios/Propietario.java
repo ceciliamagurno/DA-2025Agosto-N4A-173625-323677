@@ -12,8 +12,8 @@ public class Propietario extends Usuario {
    private double saldo;
    private double saldoMinimoAlerta;
 
-   private ArrayList<Vehiculo> vehiculos = new ArrayList<>();
-   private ArrayList<AsignacionDeBonificacion> asignacionesBonificacion = new ArrayList<>();
+   private ArrayList<Vehiculo> vehiculos;
+   private ArrayList<AsignacionDeBonificacion> asignacionesBonificacion;
 
    private Estado estado;
 
@@ -23,6 +23,8 @@ public class Propietario extends Usuario {
           this.saldo = saldo;
           this.saldoMinimoAlerta = saldoMinimoAlerta;
           this.estado = new EstadoHabilitado(); //por defecto
+          this.vehiculos = new ArrayList<>();
+          this.asignacionesBonificacion = new ArrayList<>();
    }
 
    //cosas para estado
