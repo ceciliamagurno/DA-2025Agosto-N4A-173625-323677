@@ -13,7 +13,6 @@ import ort.da.DAObligatorio.modelo.bonificaciones.Exonerado;
 import ort.da.DAObligatorio.modelo.bonificaciones.ReglaBonificacion;
 import ort.da.DAObligatorio.modelo.estados.Estado;
 import ort.da.DAObligatorio.modelo.estados.EstadoDeshabilitado;
-import ort.da.DAObligatorio.modelo.peajes.AsignacionDeBonificacion;
 import ort.da.DAObligatorio.modelo.peajes.Puesto;
 import ort.da.DAObligatorio.modelo.usuarios.Administrador;
 import ort.da.DAObligatorio.modelo.usuarios.Propietario;
@@ -99,21 +98,27 @@ public class PeajeApplication {
                 prop1.agregarVehiculo(v1);
                 
 
-       
-
-
-
         Propietario prop2 = new Propietario(
                 "23456788",
                 "prop.1234",
                 "Usuario Propietario Des",
                 2000,
                 500);
-        prop2.setEstado(estadoDeshabilitado);
-        
+                prop2.setEstado(estadoDeshabilitado);
 
+
+                Propietario prop3 = new Propietario(
+                "23456888",
+                "prop.123",
+                "Usuario Propietario Juan",
+                2000,
+                500);
+                prop3.agregarVehiculo(v2);
+
+                
         f.agregarPropietario(prop1);
         f.agregarPropietario(prop2);
+        f.agregarPropietario(prop3);
 
 
         f.asignarBonificacionAPropietario(prop1, trabajadores, sur);
