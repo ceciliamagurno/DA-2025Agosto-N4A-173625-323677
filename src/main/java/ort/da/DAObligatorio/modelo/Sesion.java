@@ -8,6 +8,7 @@ public class Sesion {
    
     private LocalDateTime fechaHoraIngreso;
     private Usuario usuario;
+    
 
     public Sesion(Usuario usuario) {
         this.usuario = usuario;

@@ -193,7 +193,20 @@ public class Fachada extends Observable{
         String matricula,
         String nombrePuesto,
         LocalDateTime fechaHora) throws PeajeException {
-        return sTransitos.registrarTransito(matricula, nombrePuesto, fechaHora);
+       
+            RegistroResultadoTransito res = sTransitos.registrarTransito(matricula, nombrePuesto, fechaHora);
+
+            Propietario p = buscarPropietarioPorMatricula(matricula);
+            if (p != null){
+                
+                Object[] ev = new Object[3];
+                ev[0] = p;
+                ev[1] = "TRANSITO_REGISTRADO";
+                ev[2] = res;
+
+                this.avisar(ev);
+            }
+        return res;
     }
 
     public RegistroResultadoTransito registrarTransito(
