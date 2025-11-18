@@ -76,7 +76,7 @@
         // Cargar listas iniciales (bonificaciones y puestos)
         async function cargarListas() {
             try {
-                const resp = await fetch('/tablero/listas');
+                const resp = await fetch('/bonificaciones/listas');
                 if (!resp.ok) throw new Error('Error al cargar listas');
                 const data = await resp.json();
                 const bonResp = data.find(r => r.id === 'bonificaciones');
@@ -112,8 +112,8 @@
         btnBuscar.addEventListener('click', async () => {
             const cedula = cedulaInput.value && cedulaInput.value.trim();
             if (!cedula) { await mostrarMensaje('Ingrese una cédula para buscar.'); return; }
-            try {
-                const resp = await fetch(`/tablero/buscar?cedula=${encodeURIComponent(cedula)}`);
+                try {
+                const resp = await fetch(`/bonificaciones/buscar?cedula=${encodeURIComponent(cedula)}`);
                 if (!resp.ok) throw new Error('Error en la búsqueda');
                 const data = await resp.json();
                 const propResp = data.find(r => r.id === 'propietario');
@@ -125,11 +125,16 @@
                 estadoProp.textContent = estadoObj.nombre || (estadoObj ? String(estadoObj) : '-');
 
                 const asignaciones = Array.isArray(asignResp && asignResp.parametro) ? asignResp.parametro : [];
-                const tablaData = asignaciones.map(a => ({
-                    bonificacion: a.bonificacion ? a.bonificacion.nombre : (a.bonificacion || ''),
-                    puesto: a.puesto ? a.puesto.nombre : (a.puesto || ''),
-                    fechaAsignacion: a.fechaAsignacion || ''
-                }));
+                const tablaData = asignaciones.map(a => {
+                    const bon = a && (a.nombreBonificacion || (a.bonificacion && (a.bonificacion.nombre || a.bonificacion)) || '');
+                    const puesto = a && (a.nombrePuesto || (a.puesto && (a.puesto.nombre || a.puesto)) || '');
+                    const fecha = a && (a.fechaAlta || a.fechaAsignacion || '');
+                    return {
+                        bonificacion: bon,
+                        puesto: puesto,
+                        fechaAsignacion: fecha
+                    };
+                });
                 tablaAsignacionesDiv.innerHTML = crearTablaDesdeJson(tablaData);
                 infoProp.style.display = 'block';
             } catch (err) {
@@ -162,7 +167,12 @@
                 const asignacionesResp = (resp.find && resp.find(r => r.id === 'asignaciones')) ? resp.find(r => r.id === 'asignaciones').parametro : null;
                 if (mensajeResp) { await mostrarMensaje(mensajeResp); return; }
                 if (asignacionesResp) {
-                    const tablaData = asignacionesResp.map(a => ({ bonificacion: a.bonificacion ? a.bonificacion.nombre : '', puesto: a.puesto ? a.puesto.nombre : '', fechaAsignacion: a.fechaAsignacion }));
+                    const tablaData = asignacionesResp.map(a => {
+                        const bon = a && (a.nombreBonificacion || (a.bonificacion && (a.bonificacion.nombre || a.bonificacion)) || '');
+                        const puesto = a && (a.nombrePuesto || (a.puesto && (a.puesto.nombre || a.puesto)) || '');
+                        const fecha = a && (a.fechaAlta || a.fechaAsignacion || '');
+                        return { bonificacion: bon, puesto: puesto, fechaAsignacion: fecha };
+                    });
                     tablaAsignacionesDiv.innerHTML = crearTablaDesdeJson(tablaData);
                     await mostrarMensaje('Bonificación asignada correctamente');
                 }

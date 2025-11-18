@@ -77,10 +77,10 @@ public class ServicioNotificaciones implements Observador {
                     String tipo = (String) ev[1];
                     Object detalle = ev[2];
                     if("ESTADO_CAMBIADO".equals(tipo)){
-                        String msj = "Tu estado fue cambiado a: "+ detalle + ",";
+                        String msj = "Tu estado fue cambiado a: "+ detalle;
                         agregarNotificacion(msj, p);
                     }else if("ASIGNACION_BONIFICACION".equals(tipo)){
-                        String msj = "Se te asignó la bonificación "+ detalle + ",";
+                        String msj = "Se te asignó la bonificación "+ detalle;
                         agregarNotificacion(msj, p);
                     }//AGREGAR TAMBIEN OTROS TIPOS DE NOTIFICACIONES ACA EJEMPLO SALDO BAJO ETC ETC
                 }

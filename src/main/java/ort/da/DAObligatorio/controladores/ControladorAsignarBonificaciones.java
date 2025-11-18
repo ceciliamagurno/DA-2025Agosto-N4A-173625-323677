@@ -1,13 +1,19 @@
 package ort.da.DAObligatorio.controladores;
 
 import java.util.List;
+import java.util.Map;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ort.da.DAObligatorio.dtos.PropietarioDto;
+import ort.da.DAObligatorio.dtos.AsignacionBonificacionDto;
 import ort.da.DAObligatorio.excepciones.PeajeException;
 import ort.da.DAObligatorio.modelo.bonificaciones.Bonificacion;
 import ort.da.DAObligatorio.modelo.peajes.AsignacionDeBonificacion;
@@ -76,10 +82,74 @@ public class ControladorAsignarBonificaciones {
         } catch (PeajeException ex) {
             return Respuesta.lista(new Respuesta("mensaje","No se pudo asignar la bonificación: " + ex.getMessage()));
         }
-        //avtualizo asignaciones 
+        //actualizo asignaciones y las transformo a DTOs
         List<AsignacionDeBonificacion> asignacionesActual = f.obtenerAsignacionesPorPropietario(p);
-        
-        return Respuesta.lista(new Respuesta("asignaciones", asignacionesActual), new Respuesta("propietario", new PropietarioDto(p)));
+        List<AsignacionBonificacionDto> asignDto = new ArrayList<>();
+        if (asignacionesActual != null) {
+            for (AsignacionDeBonificacion a : asignacionesActual) {
+                if (a != null) asignDto.add(new AsignacionBonificacionDto(a));
+            }
+        }
+
+        return Respuesta.lista(new Respuesta("asignaciones", asignDto), new Respuesta("propietario", new PropietarioDto(p)));
     }
 
+    @GetMapping("/listas")
+    public List<Respuesta> listarRecursos() {
+        List<String> nombresBon = new ArrayList<>();
+        List<String> nombresPuestos = new ArrayList<>();
+
+        List<Bonificacion> bns = f.obtenerBonificaciones();
+        if (bns != null) {
+            for (Bonificacion b : bns) {
+                if (b != null)
+                    nombresBon.add(b.getNombre());
+            }
+        }
+
+        List<Puesto> pts = f.getPuestos();
+        if (pts != null) {
+            for (Puesto p : pts) {
+                if (p != null)
+                    nombresPuestos.add(p.getNombre());
+            }
+        }
+
+        return Respuesta.lista(new Respuesta("bonificaciones", nombresBon), new Respuesta("puestos", nombresPuestos));
+    }
+
+    @GetMapping("/buscar")
+    public List<Respuesta> buscarPropietario(@RequestParam String cedula) {
+        Propietario p = f.buscarPropietarioPorCedula(cedula);
+        if (p == null) {
+            return Respuesta.lista(new Respuesta("mensaje", "no existe el propietario"));
+        }
+
+        // Propietario DTO
+        PropietarioDto dto = new PropietarioDto(p);
+
+        // Asignaciones
+        List<AsignacionDeBonificacion> asignaciones = f.obtenerAsignacionesPorPropietario(p);
+        List<Map<String, Object>> listaAsign = new ArrayList<>();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        if (asignaciones != null) {
+            for (AsignacionDeBonificacion a : asignaciones) {
+                if (a == null)
+                    continue;
+                Map<String, Object> m = new HashMap<>();
+                Map<String, String> bon = new HashMap<>();
+                Map<String, String> puesto = new HashMap<>();
+                if (a.getBonificacion() != null)
+                    bon.put("nombre", a.getBonificacion().getNombre());
+                if (a.getPuesto() != null)
+                    puesto.put("nombre", a.getPuesto().getNombre());
+                m.put("bonificacion", bon);
+                m.put("puesto", puesto);
+                m.put("fechaAsignacion", a.getFechaAlta() == null ? "" : a.getFechaAlta().format(fmt));
+                listaAsign.add(m);
+            }
+        }
+
+        return Respuesta.lista(new Respuesta("propietario", dto), new Respuesta("asignaciones", listaAsign));
+    }
 }
