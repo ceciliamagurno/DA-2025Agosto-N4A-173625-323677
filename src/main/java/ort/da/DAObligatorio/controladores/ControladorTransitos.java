@@ -111,7 +111,7 @@ public class ControladorTransitos {
                 dto.setCategoriaVehiculo(veh.getCategoria().name());
                 
             }
-
+            
             return Respuesta.lista(new Respuesta("resultado", dto)); 
         } catch (PeajeException ex) {
             return Respuesta.lista(new Respuesta("mensaje", ex.getMessage()));

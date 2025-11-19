@@ -3,7 +3,7 @@ package ort.da.DAObligatorio.controladores;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +41,7 @@ public class ControladorTableroPropietario implements Observador{
 
     private Propietario propietarioSesion;
 
-    public ControladorTableroPropietario(ConexionNavegador conexionNavegador) {
+    public ControladorTableroPropietario(@Autowired ConexionNavegador conexionNavegador) {
         this.conexionNavegador = conexionNavegador;
     }
 
@@ -109,9 +109,9 @@ public class ControladorTableroPropietario implements Observador{
             "ASIGNACION_BONIFICACION".equals(tipoEvento)||
             "TRANSITO_REGISTRADO".equals(tipoEvento)){
                 //rearmo el dto actualizado
-            PorpietarioTableroDto dto = armarTablero(this.propietarioSesion);
+            PorpietarioTableroDto dto = armarTablero(propEvento);
                 //envio notificaion SSE
-                conexionNavegador.enviarJSON(new Respuesta("tableroPropietario", dto));
+                conexionNavegador.enviarJSON(Respuesta.lista(new Respuesta("tableroPropietario", dto)));
         
         }
 

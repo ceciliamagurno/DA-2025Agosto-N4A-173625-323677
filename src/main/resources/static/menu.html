@@ -170,18 +170,11 @@
           ul.appendChild(li);
         }
       }
-
-      document.getElementById("vehiculosDiv").innerHTML =
-          crearTablaDesdeJson(dto.vehiculos);
-
-      document.getElementById("bonificacionesDiv").innerHTML =
-          crearTablaDesdeJson(dto.bonificaciones);
-
-      document.getElementById("transitosDiv").innerHTML =
-          crearTablaDesdeJson(dto.transitos || []);
-
     }
 
+    function procesarMensajeSSE(mensaje){
+        procesarResultadosSubmit(mensaje);
+    }
 
 
 

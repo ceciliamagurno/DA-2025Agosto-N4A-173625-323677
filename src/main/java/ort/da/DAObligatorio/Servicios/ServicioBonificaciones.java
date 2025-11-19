@@ -70,6 +70,8 @@ public class ServicioBonificaciones {
         asignaciones.add(asignacion);
 
         propietario.agregarAsignacionBonificacion(asignacion);
+
+        propietario.agregarAsignacionBonificacion(asignacion);
     }
 
     public List<AsignacionDeBonificacion> obtenerAsignacionesPorPropietario(Propietario propietario) {
