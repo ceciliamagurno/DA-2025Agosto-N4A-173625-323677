@@ -1,4 +1,4 @@
-package ort.da.DAObligatorio.utils;
+package ort.da.DAObligatorio;
 
 
 import java.time.LocalDateTime;
@@ -89,50 +89,55 @@ public class PeajeApplication {
         
         Estado estadoDeshabilitado = new EstadoDeshabilitado();
 
+        // PROPIETARIOS
         Propietario prop1 = new Propietario(
-                "23456789",
-                "prop.123",
-                "Usuario Propietario Juan",
-                2000,
-                500);
-                prop1.agregarVehiculo(v1);
-                
+            "23456789",
+            "prop.123",
+            "Usuario Propietario Juan",
+            2000,
+            500);
+        prop1.agregarVehiculo(v1);
 
         Propietario prop2 = new Propietario(
-                "23456788",
-                "prop.1234",
-                "Usuario Propietario Des",
-                2000,
-                500);
-                prop2.setEstado(estadoDeshabilitado);
+            "23456788",
+            "prop.1234",
+            "Usuario Propietario Des",
+            2000,
+            500);
+        prop2.cambiarEstado(estadoDeshabilitado);
 
+        Propietario prop3 = new Propietario(
+            "23456888",
+            "prop.123",
+            "Usuario Propietario Ana",
+            2000,
+            500);
+        prop3.agregarVehiculo(v2);
 
-                Propietario prop3 = new Propietario(
-                "23456888",
-                "prop.123",
-                "Usuario Propietario Juan",
-                2000,
-                500);
-                prop3.agregarVehiculo(v2);
-
-                
         f.agregarPropietario(prop1);
         f.agregarPropietario(prop2);
         f.agregarPropietario(prop3);
 
-
-        f.asignarBonificacionAPropietario(prop1, trabajadores, sur);
-        f.registrarTransito(v1.getMatricula(),norte.getNombre(), LocalDateTime.now().minusDays(1));
-        f.registrarTransito(v1.getMatricula(), norte.getNombre(),  LocalDateTime.now().minusHours(5));
-        f.registrarTransito(v1.getMatricula(), norte.getNombre(),  LocalDateTime.now().minusMinutes(30));
-
-        //administrador
-
+     
         Administrador admin1 = new Administrador(
             "12345678",
             "admin.123",
             "Usuario Administrador");
-
         f.agregarAdministrador(admin1);
+
+        try {
+            f.asignarBonificacionAPropietario(prop1, trabajadores, sur);
+        } catch (PeajeException e) {
+            e.printStackTrace(); // 
+        }
+
+        try {
+            f.registrarTransito(v1.getMatricula(), norte.getNombre(), LocalDateTime.now().minusDays(1));
+            f.registrarTransito(v1.getMatricula(), norte.getNombre(), LocalDateTime.now().minusHours(5));
+            f.registrarTransito(v1.getMatricula(), norte.getNombre(), LocalDateTime.now().minusMinutes(30));
+        } catch (PeajeException e) {
+            e.printStackTrace();
+        }
     }
+
 }

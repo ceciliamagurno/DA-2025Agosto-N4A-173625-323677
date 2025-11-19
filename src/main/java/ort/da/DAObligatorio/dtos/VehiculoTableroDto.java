@@ -1,5 +1,7 @@
 package ort.da.DAObligatorio.dtos;
 
+import ort.da.DAObligatorio.modelo.vehiculos.Vehiculo;
+
 public class VehiculoTableroDto {
 
     private String matricula;
@@ -11,7 +13,7 @@ public class VehiculoTableroDto {
 
     public VehiculoTableroDto() { }
 
-    public VehiculoTableroDto(ort.da.DAObligatorio.modelo.vehiculos.Vehiculo v) {
+    public VehiculoTableroDto(Vehiculo v) {
         this.matricula = v.getMatricula();
         this.modelo   = v.getModelo();
         this.color    = v.getColor();

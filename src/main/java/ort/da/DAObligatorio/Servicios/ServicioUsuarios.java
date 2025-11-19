@@ -93,8 +93,10 @@ public class ServicioUsuarios extends Observable{
         if(p ==null){
             throw new PeajeException("No existe propietario con esa cedula.");
         }
-        p.setEstado(e);
+        p.cambiarEstado(e);
     }
+
+ 
 
     
 

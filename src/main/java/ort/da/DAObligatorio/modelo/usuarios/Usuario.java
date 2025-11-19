@@ -13,12 +13,11 @@ public abstract class Usuario {
     }
 
     public boolean verificarContrasenia(String contrasenia) {
-        return this.contrasenia.equals(contrasenia);
+        return this.contrasenia != null && this.contrasenia.equals(contrasenia);
     }
 
     public boolean coincideCedula(String cedula){
-        if(cedula == null) return false;
-        return cedula.equals(this.cedula);
+        return this.cedula != null && this.cedula.equals(cedula);
     }
 
     public String getCedula() {

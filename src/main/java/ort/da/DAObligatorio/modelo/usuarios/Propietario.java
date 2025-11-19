@@ -3,9 +3,12 @@ package ort.da.DAObligatorio.modelo.usuarios;
 import java.util.ArrayList;
 import java.util.List;
 
+import ort.da.DAObligatorio.modelo.bonificaciones.Bonificacion;
 import ort.da.DAObligatorio.modelo.estados.*;
 import ort.da.DAObligatorio.modelo.peajes.AsignacionDeBonificacion;
 import ort.da.DAObligatorio.modelo.vehiculos.Vehiculo;
+import ort.da.DAObligatorio.servicios.RegistroResultadoTransito;
+import ort.da.DAObligatorio.servicios.fachada.Fachada;
 
 public class Propietario extends Usuario {
     
@@ -32,9 +35,12 @@ public class Propietario extends Usuario {
        return estado;
    }
 
-   public void setEstado(Estado estado) {
-       this.estado = estado;
+   public void cambiarEstado(Estado nuevoEstado) {
+       this.estado = nuevoEstado;
+       notificarEvento("ESTADO_CAMBIADO", nuevoEstado!= null ? nuevoEstado.nombre(): null);
    }
+
+
 
    //cosas para saldo
 
@@ -77,6 +83,13 @@ public class Propietario extends Usuario {
          }
     }
 
+    public void notificarAsignacionBonificacion(Bonificacion bonificacion) {
+         String nombreBonificacion = (bonificacion != null ? bonificacion.getNombre() : null);
+         notificarEvento("ASIGNACION_BONIFICACION", nombreBonificacion);
+    }
+    
+    
+    
     public List<AsignacionDeBonificacion> getAsignacionesBonificacion() {
          return new ArrayList<AsignacionDeBonificacion>(asignacionesBonificacion);
     }
@@ -90,6 +103,20 @@ public class Propietario extends Usuario {
        return false;
      }
 
+     public void notificarTransitoRegistrado(RegistroResultadoTransito registro){
+          notificarEvento("TRANSITO_REGISTRADO", registro);
+     }
+
+
+     private void notificarEvento(String evento, Object object) {
+          Object[] ev = new Object[3];
+          ev[0] = this;
+          ev[1] = evento;
+          ev[2] = object;
+
+          Fachada.getInstancia().avisar(ev);
+         
+     }
 
 
 }

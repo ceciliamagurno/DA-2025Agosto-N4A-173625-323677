@@ -16,6 +16,7 @@ import ort.da.DAObligatorio.dtos.BonificacionDto;
 import ort.da.DAObligatorio.dtos.NotificacionDto;
 import ort.da.DAObligatorio.dtos.PorpietarioTableroDto;
 import ort.da.DAObligatorio.dtos.TransitoDto;
+import ort.da.DAObligatorio.dtos.VehiculoTableroDto;
 import ort.da.DAObligatorio.modelo.usuarios.Propietario;
 import ort.da.DAObligatorio.modelo.usuarios.Usuario;
 import ort.da.DAObligatorio.modelo.vehiculos.Vehiculo;
@@ -123,7 +124,13 @@ public class ControladorTableroPropietario implements Observador{
 
 
      private PorpietarioTableroDto armarTablero(Propietario propietario) {
-           PorpietarioTableroDto dto = new PorpietarioTableroDto();
+        PorpietarioTableroDto dto = new PorpietarioTableroDto();
+
+        List<Transito> transitosModelo = f.obtenerTransitosPorPropietario(propietario);
+        List<Vehiculo> vehiculos = propietario.getVehiculos();
+        List<AsignacionDeBonificacion> asignaciones = f.obtenerAsignacionesPorPropietario(propietario);
+        List<Notificacion> notificacionesModelo = f.obtenerNotificacionesDelPropietario(propietario);
+
 
         dto.setNombreCompleto(propietario.getNombreCompleto());
         dto.setEstado(propietario.getEstado() == null ? "Habilitado" : propietario.getEstado().nombre());
@@ -131,28 +138,55 @@ public class ControladorTableroPropietario implements Observador{
         dto.setSaldoMinimoAlerta(propietario.getSaldoMinimoAlerta());
 
         // Vehículos
-        List<Vehiculo> vehiculos = propietario.getVehiculos();
-        int cantidadVehiculos = (vehiculos == null) ? 0 : vehiculos.size();
-        dto.setCantidadVehiculos(cantidadVehiculos);
+        List<VehiculoTableroDto> vehiculosDto = new ArrayList<>();
 
-        // Si usás VehiculoTableroDto, acá armás la lista
-        // (si no, mantenés tu lógica actual)
-        // ...
+        
+        for(Vehiculo v: vehiculos){
+            VehiculoTableroDto vDto = new VehiculoTableroDto();
+            vDto.setMatricula(v.getMatricula());
+            vDto.setModelo(v.getModelo());
+            vDto.setColor(v.getColor());
+            vDto.setCategoria(v.getCategoria()!= null ? v.getCategoria().name() :null);
+        
+            int cantidad = 0;
+            double total = 0;
+            for(Transito t: transitosModelo){
+                if(t !=null && t.getMatricula().equalsIgnoreCase(v.getMatricula()));{
+                    cantidad++;
+                    total += t.getMontoCobrado();
+                }
+            }
+            vDto.setCantidadTransitos(cantidad);
+            vDto.setTotalGastado(total);
+        
+            vehiculosDto.add(vDto);
+        
+        }
+
+         dto.setVehiculos(vehiculosDto);
+        // int cantidadVehiculos = (vehiculos == null) ? 0 : vehiculos.size();
+        // dto.setCantidadVehiculos(cantidadVehiculos);
+        // dto.setVehiculos(vehiculosDto);
+
+        
 
         // Tránsitos
-        List<TransitoDto> transitosDto = new ArrayList<>();
-        List<Transito> transitosModelo = f.obtenerTransitosPorPropietario(propietario);
+        List<TransitoDto> transitosDto = new ArrayList<TransitoDto>();
+        
         if (transitosModelo != null) {
             for (Transito t : transitosModelo) {
-                transitosDto.add(new TransitoDto(t));
+                if(t !=null){
+                    transitosDto.add(new TransitoDto(t));
+                }
             }
         }
+
         dto.setTransitos(transitosDto);
         dto.setCantidadTransitos(transitosDto.size());
 
         // Bonificaciones
         List<BonificacionDto> bonificacionesDto = new ArrayList<>();
-        List<AsignacionDeBonificacion> asignaciones = f.obtenerAsignacionesPorPropietario(propietario);
+        
         if (asignaciones != null) {
             for (AsignacionDeBonificacion a : asignaciones) {
                 bonificacionesDto.add(new BonificacionDto(a));
@@ -162,7 +196,7 @@ public class ControladorTableroPropietario implements Observador{
 
         // Notificaciones
         List<NotificacionDto> notisDto = new ArrayList<>();
-        List<Notificacion> notificacionesModelo = f.obtenerNotificacionesDelPropietario(propietario);
+        
         if (notificacionesModelo != null) {
             for (Notificacion n : notificacionesModelo) {
                 notisDto.add(new NotificacionDto(n));

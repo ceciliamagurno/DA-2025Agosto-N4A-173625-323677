@@ -12,13 +12,16 @@ public class Transito {
     private double  montoCobrado;
     private String bonificacionAplicada;
 
-    public Transito(String matricula, Puesto puesto, double montoCobrado, String bonificacionAplicada, LocalDateTime fechaHora) {
+    public Transito(String matricula,
+                    Puesto puesto,
+                    LocalDateTime fechaHora,
+                    double montoFinal,
+                    String bonificacionAplicada) {
         this.matricula = matricula;
         this.puesto = puesto;
-        this.montoCobrado = montoCobrado;
-        this.bonificacionAplicada = bonificacionAplicada;
         this.fechaHora = fechaHora;
-        
+        this.montoCobrado = montoFinal;
+        this.bonificacionAplicada = bonificacionAplicada;
     }
 
     public LocalDateTime getFechaHora() {

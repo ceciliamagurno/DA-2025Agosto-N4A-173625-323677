@@ -30,9 +30,4 @@ public class Tarifa {
     public CategoriaVehiculo getCategoria() {
         return categoria;
     }
-
-  
-
-
-
 }

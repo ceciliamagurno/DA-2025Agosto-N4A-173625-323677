@@ -1,4 +1,4 @@
-package ort.da.DAObligatorio.servicios.fachada;
+package ort.da.DAObligatorio.servicios;
 
 import java.util.ArrayList;
 import java.util.List;

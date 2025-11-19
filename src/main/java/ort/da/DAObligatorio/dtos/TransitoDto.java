@@ -1,7 +1,6 @@
 package ort.da.DAObligatorio.dtos;
 
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import ort.da.DAObligatorio.modelo.peajes.Transito;

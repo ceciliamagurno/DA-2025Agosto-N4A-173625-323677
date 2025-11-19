@@ -19,9 +19,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import ort.da.DAObligatorio.servicios.*;
+import ort.da.DAObligatorio.utils.Eventos;
 import ort.da.DAObligatorio.excepciones.PeajeException;
 
-public class Fachada extends Observable{
+public class Fachada extends Observable {
     
     private static Fachada instancia;
     //servicios
@@ -42,11 +43,11 @@ public class Fachada extends Observable{
         this.sUsuarios = new ServicioUsuarios();
         this.sVehiculos = new ServicioVehiculos();
         this.sPuestos = new ServicioPuestos();
-        this.sTransitos = new ServicioTransitos();
-        this.sBonificaciones = new ServicioBonificaciones();
         this.sTarifas = new ServicioTarifas();
-        this.sNotificaciones = new ServicioNotificaciones();
+        this.sBonificaciones = new ServicioBonificaciones();
+        this.sTransitos = new ServicioTransitos(sVehiculos, sUsuarios, sPuestos, sTarifas,sBonificaciones);
         this.sEstados = new ServicioEstados();
+        this.sNotificaciones = new ServicioNotificaciones();
     
         this.agregarObservador(sNotificaciones);
     }
@@ -59,6 +60,9 @@ public class Fachada extends Observable{
     }
 
 
+    public Eventos[] getEventos() {
+        return Eventos.values();
+    }
 
     //Servicio Usuarios 
     public Usuario login(String cedula, String contrasenia) {
@@ -96,46 +100,19 @@ public class Fachada extends Observable{
 
 
 
-
-
     //Servicio Estados
     public List<Estado> getEstadosDisponibles() {
         return sEstados.obtenerEstadosDisponibles();
     }
 
     public void cambiarEstadoPropietario(String cedula, String nombreEstado) throws PeajeException {
-        if (cedula == null || nombreEstado == null) {
-            throw new PeajeException("Debe indicar cédula y estado.");
-        }
-
+        //busco el estado por nombre
         Estado nuevoEstado = sEstados.obtenerEstadoPorNombre(nombreEstado);
-        if (nuevoEstado == null) {
-            throw new PeajeException("Estado inválido: " + nombreEstado);
-        }
-
-        // Reutilizamos el helper que trabaja con Estado ya resuelto
-        cambiarEstadoPropietario(cedula, nuevoEstado);
+        //delego en el servicio de usuarios
+        sUsuarios.cambiarEstadoPropietario(cedula, nuevoEstado);
     }
 
-    private void cambiarEstadoPropietario(String cedula, Estado e) throws PeajeException {
-        sUsuarios.cambiarEstadoPropietario(cedula, e);
-
-        Propietario p = sUsuarios.buscarPropietarioPorCedula(cedula);
-        if (p == null){
-            return;
-        }
-        //armar evento para avisar a los observadores
-        Object[] ev = new Object[3];
-            ev[0] = p;
-            ev[1] = "ESTADO_CAMBIADO";
-            ev[2] = e.nombre();
-            
-            this.avisar(ev);
-        
-    }
-
-
-
+    
 
 
 
@@ -154,22 +131,17 @@ public class Fachada extends Observable{
 
     public void asignarBonificacionAPropietario(Propietario propietario, Bonificacion b, Puesto p)
             throws PeajeException {
+        
         sBonificaciones.asignarBonificacionAPropietario(propietario, b, p);
-
-        //armo evento para avisar a los observadores
-        Object[] ev = new Object[3];
-        ev[0] = propietario;
-        ev[1] = "ASIGNACION_BONIFICACION";
-        ev[2] = b.getNombre();
-
-        this.avisar(ev);
+        if(propietario != null){
+            propietario.notificarAsignacionBonificacion(b);
+        }
+       
     }
 
     public List<AsignacionDeBonificacion> obtenerAsignacionesPorPropietario(Propietario propietario) {
         return sBonificaciones.obtenerAsignacionesPorPropietario(propietario);
     }
-
-
 
 
 
@@ -184,36 +156,17 @@ public class Fachada extends Observable{
         return sTransitos.getTransitos();
     }
 
-
     public List<Transito> obtenerTransitosPorPropietario(Propietario p) {
         return sTransitos.obtenerTransitosPorPropietario(p);
     }   
 
-    public RegistroResultadoTransito registrarTransito(
-        String matricula,
-        String nombrePuesto,
-        LocalDateTime fechaHora) throws PeajeException {
-       
-            RegistroResultadoTransito res = sTransitos.registrarTransito(matricula, nombrePuesto, fechaHora);
-
-            Propietario p = buscarPropietarioPorMatricula(matricula);
-            if (p != null){
-                
-                Object[] ev = new Object[3];
-                ev[0] = p;
-                ev[1] = "TRANSITO_REGISTRADO";
-                ev[2] = res;
-
-                this.avisar(ev);
-            }
-        return res;
+    public RegistroResultadoTransito registrarTransito(String matricula,
+                                                    String nombrePuesto,
+                                                    LocalDateTime fechaHora) throws PeajeException {
+                                                        
+        return sTransitos.registrarTransito(matricula, nombrePuesto, fechaHora);
     }
 
-    public RegistroResultadoTransito registrarTransito(
-        String matricula,
-        String nombrePuesto) throws PeajeException {
-        return sTransitos.registrarTransito(matricula, nombrePuesto, LocalDateTime.now());
-    }
 
 
 
@@ -239,8 +192,7 @@ public class Fachada extends Observable{
     }
 
 
-
-
+    
 
     //Servicio puestos
 
@@ -308,7 +260,5 @@ public class Fachada extends Observable{
         sNotificaciones.agregarNotificacion(mensaje, propietario);
     }
 
-
-    
 
 }
