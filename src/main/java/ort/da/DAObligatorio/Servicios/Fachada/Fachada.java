@@ -133,9 +133,9 @@ public class Fachada extends Observable {
             throws PeajeException {
         
         sBonificaciones.asignarBonificacionAPropietario(propietario, b, p);
-        if(propietario != null){
-            propietario.notificarAsignacionBonificacion(b);
-        }
+        
+        propietario.notificarAsignacionBonificacion(b);
+        
        
     }
 
@@ -239,9 +239,7 @@ public class Fachada extends Observable {
 
     //Servicio Notificaciones
     public void agregarNotificacion(String msj, Propietario propietario) {
-        if (msj == null || propietario == null) {
-            return;
-        }
+        
         sNotificaciones.agregarNotificacion(msj, propietario);
     }
 

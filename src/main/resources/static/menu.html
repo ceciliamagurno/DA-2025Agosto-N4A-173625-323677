@@ -145,7 +145,7 @@
 
     //renderizar la vista al cargar la página
     function mostrar_tableroPropietario(dto) {
-      console.log("DTO recibido:", dto);
+
         
 
       document.getElementById("nombreMini").textContent = dto.nombreCompleto;
@@ -166,7 +166,8 @@
       if (dto.notificaciones) {
         for (const n of dto.notificaciones) {
           const li = document.createElement("li");
-          li.textContent = n.mensaje;
+          const texto = (n.fechaHora ? n.fechaHora + ' ' : '') + (n.mensaje ? n.mensaje : '');
+          li.textContent = texto;
           ul.appendChild(li);
         }
       }

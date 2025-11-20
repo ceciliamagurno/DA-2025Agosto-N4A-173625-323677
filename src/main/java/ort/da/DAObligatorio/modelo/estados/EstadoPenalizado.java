@@ -6,4 +6,6 @@ public class EstadoPenalizado extends Estado {
     public boolean aplicaBonificaciones() {
         return false;
     }
+    
+
 }

@@ -27,13 +27,25 @@ public class AsignacionBonificacionDto {
 
     public AsignacionBonificacionDto() {}
 
-    public String getNombreBonificacion() { return nombreBonificacion; }
-    public void setNombreBonificacion(String nombreBonificacion) { this.nombreBonificacion = nombreBonificacion; }
+    public String getNombreBonificacion() { 
+        return nombreBonificacion; 
+    }
+    public void setNombreBonificacion(String nombreBonificacion) { 
+        this.nombreBonificacion = nombreBonificacion; 
+    }
 
-    public String getNombrePuesto() { return nombrePuesto; }
-    public void setNombrePuesto(String nombrePuesto) { this.nombrePuesto = nombrePuesto; }
+    public String getNombrePuesto() { 
+        return nombrePuesto; 
+    }
+    public void setNombrePuesto(String nombrePuesto) { 
+        this.nombrePuesto = nombrePuesto; 
+    }
 
-    public String getFechaAlta() { return fechaAlta; }
-    public void setFechaAlta(String fechaAlta) { this.fechaAlta = fechaAlta; }
+    public String getFechaAlta() { 
+        return fechaAlta; 
+    }
+    public void setFechaAlta(String fechaAlta) { 
+        this.fechaAlta = fechaAlta; 
+    }
 
 }

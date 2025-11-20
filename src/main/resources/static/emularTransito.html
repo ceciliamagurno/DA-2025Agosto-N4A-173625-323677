@@ -116,8 +116,8 @@
     mostrarMensaje("Error (" + status + "): " + text);
   }
 
-  // --- 1) Cargar puestos en el select ---
-  // Respuesta: new Respuesta("puestos", puestos)
+  // Cargao puestos en el select al iniciar la vista
+  
   function mostrar_puestos(puestos) {
     var select = document.getElementById("selectPuesto");
     if (!select) return;
@@ -136,13 +136,13 @@
       if (!p) continue;
 
       var opt = document.createElement("option");
-      opt.value = p.nombre;        // el backend espera nombrePuesto
+      opt.value = p.nombre;       
       opt.textContent = p.nombre;
       select.appendChild(opt);
     }
   }
 
-  // --- 2) Al cambiar de puesto, cargar tarifas y actualizar hidden ---
+  // si cambio de puesto, cargar tarifas y actualizar hidden
   function onCambioPuesto() {
     var select = document.getElementById("selectPuesto");
     var nombreP = select.value;
@@ -168,7 +168,6 @@
     );
   }
 
-  // Respuesta: new Respuesta("tarifas", resultado)
   function mostrar_tarifas(tarifas) {
     var tarifasDiv = document.getElementById("tarifasDiv");
     if (!tarifasDiv) return;
@@ -191,7 +190,7 @@
   }
 
   // --- 4) Mostrar resultado ---
-  // El backend devuelve: new Respuesta("resultado", dto)
+
   function mostrar_resultado(dto) {
     var cont = document.getElementById("resultadoDiv");
     if (!cont) return;
@@ -201,7 +200,6 @@
         "<p class='small-muted'>No se recibió información del tránsito.</p>";
       return;
     }
-    console.log(dto);//BORRAR CLG
     cont.innerHTML = crearTablaDesdeJson([dto]);
   }
 

@@ -124,7 +124,7 @@ public class ServicioBonificaciones {
 
         // Si no hay bonificación o no hay regla, devolvemos el monto base
         if (tarifa == null) {
-            return 0; // o lanzar PeajeException si preferís
+            return 0;
         }
         if (bonificacion == null || bonificacion.getRegla() == null) {
             return tarifa.getMonto();

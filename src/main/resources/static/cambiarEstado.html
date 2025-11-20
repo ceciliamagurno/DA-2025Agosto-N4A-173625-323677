@@ -102,7 +102,7 @@
             }
 
             try {
-                const resp = await fetch(`/tablero/buscar?cedula=${encodeURIComponent(cedula)}`);
+                const resp = await fetch(`/propietarios/buscar?cedula=${encodeURIComponent(cedula)}`);
                 if (!resp.ok) throw new Error('Error en la búsqueda');
                 const data = await resp.json();
 
@@ -130,11 +130,11 @@
                 // Mostrar datos del propietario (solo nombre y estado actual en la zona inferior)
                 nombreProp.textContent = propietarioEncontrado.nombreCompleto || '-';
 
-                // estado puede venir como objeto
+              
                 const estadoObj = propietarioEncontrado.estado || {};
                 estadoActualSpan.textContent = estadoObj.nombre || (estadoObj ? String(estadoObj) : '-');
 
-                        // Si backend no trae estados, usar fallback cliente
+                     
                         if (!Array.isArray(estadosSistema) || estadosSistema.length === 0) {
                             estadosSistema = [
                                 { nombre: 'Habilitado' },
@@ -144,7 +144,7 @@
                             ];
                         }
 
-                        // Poblar select nativo con los estados (reemplaza el contenido previo)
+                       
                         const selectEstados = document.getElementById('selectEstados') || document.createElement('select');
                         selectEstados.id = 'selectEstados';
                         selectEstados.name = 'selectEstados';
@@ -164,11 +164,11 @@
                             selectEstados.appendChild(opt);
                         });
 
-                        // colocar el select dentro del contenedor
+                      
                         listaEstadosDiv.innerHTML = '';
                         listaEstadosDiv.appendChild(selectEstados);
 
-                        // seleccionar por texto el estado actual si existe (normalizar: quitar acentos, trim, lowercase)
+                       
                         try {
                             const valorEstadoActual = (estadoObj && (estadoObj.nombre || estadoObj)) ? String(estadoObj.nombre || estadoObj) : '';
                             function normalizar(s) {
@@ -203,7 +203,7 @@
                                     }
                                 }
 
-                                // Si aún no encontrado, añadir una opción con el estado actual y seleccionarla
+                               
                                 if (!encontrado) {
                                     console.warn('No se encontró coincidencia para estado actual en options; creando opción con el valor actual:', valorEstadoActual);
                                     const opt = document.createElement('option');
@@ -272,8 +272,18 @@
                     // actualizar vista
                     propietarioEncontrado = estadoCambiado;
                     nombreProp.textContent = propietarioEncontrado.nombreCompleto || '-';
-                    const nuevoEstado = propietarioEncontrado.estado || {};
-                    estadoActualSpan.textContent = nuevoEstado.nombre || '-';
+                    const nuevoEstado = propietarioEncontrado.estado;
+                    let estadoTexto = '-';
+                    if (nuevoEstado == null) {
+                        estadoTexto = '-';
+                    } else if (typeof nuevoEstado === 'string') {
+                        estadoTexto = nuevoEstado;
+                    } else if (nuevoEstado.nombre) {
+                        estadoTexto = nuevoEstado.nombre;
+                    } else {
+                        estadoTexto = String(nuevoEstado);
+                    }
+                    estadoActualSpan.textContent = estadoTexto;
                     await mostrarMensaje('Estado cambiado correctamente');
                 } else {
                     await mostrarMensaje('Operación finalizada');

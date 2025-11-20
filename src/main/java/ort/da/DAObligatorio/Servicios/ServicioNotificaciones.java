@@ -14,6 +14,7 @@ import ort.da.DAObligatorio.observador.Observador;
 public class ServicioNotificaciones implements Observador {
 
     private List<RegistroNotificacion> registros;
+    
 
     public ServicioNotificaciones() {
         this.registros = new ArrayList<RegistroNotificacion>();
@@ -24,7 +25,7 @@ public class ServicioNotificaciones implements Observador {
         if(msj == null || propietario == null) {
             return;
         }
-
+        // Crear notificación con el mensaje puro; la fecha/hora se mostrará desde la propiedad
         Notificacion notificacion = new Notificacion(msj);
         RegistroNotificacion registro = new RegistroNotificacion(propietario, notificacion);
         registros.add(registro);
@@ -77,16 +78,44 @@ public class ServicioNotificaciones implements Observador {
                     String tipo = (String) ev[1];
                     Object detalle = ev[2];
                     if("ESTADO_CAMBIADO".equals(tipo)){
-                        String msj = "Tu estado fue cambiado a: "+ detalle;
+                        // Registrar siempre la notificación breve con la nueva redacción
+                        String msj = "Se ha cambiado tu estado en el sistema. Tu estado actual es " + detalle;
                         agregarNotificacion(msj, p);
                     }else if("ASIGNACION_BONIFICACION".equals(tipo)){
                         String msj = "Se te asignó la bonificación "+ detalle;
                         agregarNotificacion(msj, p);
-                    }//AGREGAR TAMBIEN OTROS TIPOS DE NOTIFICACIONES ACA EJEMPLO SALDO BAJO ETC ETC
+                    }else if("TRANSITO_REGISTRADO".equals(tipo)){
+                        try{
+                            
+                            if(detalle instanceof ort.da.DAObligatorio.servicios.RegistroResultadoTransito){
+                                ort.da.DAObligatorio.servicios.RegistroResultadoTransito reg = (ort.da.DAObligatorio.servicios.RegistroResultadoTransito) detalle;
+                                String puestoNombre = null;
+                                if(reg.getTarifa() != null && reg.getTarifa().getPuesto() != null){
+                                    puestoNombre = reg.getTarifa().getPuesto().getNombre();
+                                }
+                                String matricula = null;
+                                if(reg.getVehiculo() != null){
+                                    matricula = reg.getVehiculo().getMatricula();
+                                }
+                                String msj = "Pasaste por el "+ (puestoNombre != null ? puestoNombre : "") + " con el vehículo " + (matricula != null ? matricula : "") + ".";
+                                agregarNotificacion(msj, p);
+                            }
+                        }catch(Exception e){
+                            
+                        }
+                    }else if("SALDO_MINIMO_ALERTA".equals(tipo)){
+                        try{
+                            double saldoActual = p.getSaldo();
+                            String msj = "Tu saldo actual es de $ "+ saldoActual +" Te recomendamos hacer una recarga";
+                            agregarNotificacion(msj, p);
+                        }catch(Exception e){
+                            // ignorar
+                        }
+                    }
                 }
             }
         }catch(Exception ex){
-            //no hacer nada
+            //no hago nada
     }
 
    }

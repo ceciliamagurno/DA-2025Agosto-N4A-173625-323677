@@ -17,7 +17,11 @@ public abstract class Usuario {
     }
 
     public boolean coincideCedula(String cedula){
-        return this.cedula != null && this.cedula.equals(cedula);
+        if (cedula == null) return false;
+        String cedulaThis = this.cedula == null ? null : this.cedula.trim();
+        String cedulaOther = cedula == null ? null : cedula.trim();
+        if (cedulaThis == null || cedulaOther == null) return false;
+        return cedulaThis.equals(cedulaOther);
     }
 
     public String getCedula() {

@@ -1,7 +1,6 @@
 package ort.da.DAObligatorio.controladores;
 
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,12 +64,7 @@ public class ControladorCambiarEstado {
         }
        
        
-        //notificar cambio de estado
-       LocalDateTime fechaHoraCambio = LocalDateTime.now();
-       String mensajeNotificacion = "El estado de su cuenta ha sido cambiado a " + nombreEstado + " el " + fechaHoraCambio.toString();;
-       
-       f.agregarNotificacion(mensajeNotificacion, p); 
-       //devolver respuesta exitosa
+        
          return Respuesta.lista(new Respuesta("estadoCambiado", new PropietarioDto(p)));
     }
         

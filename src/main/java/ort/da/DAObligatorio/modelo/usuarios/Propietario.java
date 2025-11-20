@@ -48,10 +48,6 @@ public class Propietario extends Usuario {
          return saldo;
     }
 
-    public void acreditar(double monto) {
-         this.saldo += monto;
-    }
-
     public void debitar(double monto) {
          this.saldo -= monto;
     }
@@ -104,7 +100,14 @@ public class Propietario extends Usuario {
      }
 
      public void notificarTransitoRegistrado(RegistroResultadoTransito registro){
-          notificarEvento("TRANSITO_REGISTRADO", registro);
+           notificarEvento("TRANSITO_REGISTRADO", registro);
+           try{
+                if(this.saldo < this.saldoMinimoAlerta){
+                     notificarEvento("SALDO_MINIMO_ALERTA", null);
+                }
+           }catch(Exception ex){
+                    //ignoro
+           }
      }
 
 

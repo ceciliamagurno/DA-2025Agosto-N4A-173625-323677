@@ -28,7 +28,7 @@ public class ControladorLogin {
                                 @RequestParam String cedula,   
                                 @RequestParam String contrasenia) throws PeajeException {
         
-                                    // Intentamos autenticar el usuario
+        // Intentamos autenticar el usuario
         Usuario usuarioLogueado  = f.login(cedula, contrasenia);
         if (usuarioLogueado == null) {
             throw new PeajeException("Acceso denegado");

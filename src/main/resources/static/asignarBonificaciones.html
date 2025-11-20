@@ -113,7 +113,7 @@
             const cedula = cedulaInput.value && cedulaInput.value.trim();
             if (!cedula) { await mostrarMensaje('Ingrese una cédula para buscar.'); return; }
                 try {
-                const resp = await fetch(`/bonificaciones/buscar?cedula=${encodeURIComponent(cedula)}`);
+                const resp = await fetch(`/propietarios/buscar?cedula=${encodeURIComponent(cedula)}`);
                 if (!resp.ok) throw new Error('Error en la búsqueda');
                 const data = await resp.json();
                 const propResp = data.find(r => r.id === 'propietario');

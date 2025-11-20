@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
             navigator.sendBeacon(urlCierreVista, parametrosCierreVista);
         });
     }
-    //Quitar este metodo, ya no es necesario...revisar antes 
     try {
         ejecutarCodigoDocumentReady();
     } catch (e) {}
@@ -69,7 +68,7 @@ function submit(endPointUrl, urlEncodedData, method = 'POST') {
                 excepcionDeAplicacion(text);//Metodo que puede estar definido en la pagina que incluya esta lib 
                                             //para personalizar el manejo del error de aplicacion   
             } catch (e) {
-                alert(text); //Por defecto...
+                alert(text); 
             }
             return;
         } 

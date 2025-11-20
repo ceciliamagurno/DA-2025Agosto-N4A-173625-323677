@@ -164,9 +164,7 @@ public class ControladorTableroPropietario implements Observador{
         }
 
          dto.setVehiculos(vehiculosDto);
-        // int cantidadVehiculos = (vehiculos == null) ? 0 : vehiculos.size();
-        // dto.setCantidadVehiculos(cantidadVehiculos);
-        // dto.setVehiculos(vehiculosDto);
+        
 
         
 
@@ -206,6 +204,8 @@ public class ControladorTableroPropietario implements Observador{
 
         return dto;
     }
+
+    
 }
 
      

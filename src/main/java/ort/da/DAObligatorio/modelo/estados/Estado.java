@@ -15,9 +15,6 @@ public abstract class Estado {
         return true;
     }
    
-    public boolean puedeAgregarVehiculo(){
-        return true;
-    }
 
     public boolean permiteNotificaciones() {
         return true;

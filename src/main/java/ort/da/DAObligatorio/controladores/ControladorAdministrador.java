@@ -4,9 +4,8 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 
-//import java.util.List;
 
-//import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
@@ -16,7 +15,6 @@ import ort.da.DAObligatorio.modelo.usuarios.Administrador;
 import ort.da.DAObligatorio.modelo.usuarios.Usuario;
 import ort.da.DAObligatorio.utils.Respuesta;
 
-//import ort.da.DAObligatorio.utils.Respuesta;
 
 @RestController
 @RequestMapping("/administrador")

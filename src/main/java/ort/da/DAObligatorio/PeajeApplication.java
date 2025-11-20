@@ -57,8 +57,12 @@ public class PeajeApplication {
 
         //Tarifas
         f.crearTarifa(sur, catMoto, 120);
-        f.crearTarifa(norte, catAuto, 200);
+        f.crearTarifa(norte, catAuto, 200);  
+        f.crearTarifa(norte, catCamion, 400);
+        f.crearTarifa(norte, catMoto, 130);
         f.crearTarifa(centro, catCamion, 350);  
+        f.crearTarifa(centro, catAuto, 250);  
+        f.crearTarifa(centro, catMoto, 150);
 
         //Bonificaciones nombre + reglas
         ReglaBonificacion reglaExonerados   = new Exonerado();
@@ -111,7 +115,7 @@ public class PeajeApplication {
             "prop.123",
             "Usuario Propietario Ana",
             2000,
-            500);
+            1000);
         prop3.agregarVehiculo(v2);
 
         f.agregarPropietario(prop1);
@@ -128,7 +132,7 @@ public class PeajeApplication {
         try {
             f.asignarBonificacionAPropietario(prop1, trabajadores, sur);
         } catch (PeajeException e) {
-            e.printStackTrace(); // 
+            e.printStackTrace(); 
         }
 
         try {

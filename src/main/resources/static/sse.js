@@ -45,7 +45,7 @@ function registrarSSE(){
           
     }
 }
-//Por defecto se asume que los mensajes se reciven via SSE tienen el mismo formato que las respuestas
+//Por defecto se asume que los mensajes se reciben via SSE tienen el mismo formato que las respuestas
 //del submit. 
 function procesarMensajeSSE(mensaje){
         procesarResultadosSubmit(mensaje);

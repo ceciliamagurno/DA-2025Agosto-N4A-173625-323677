@@ -9,6 +9,8 @@ import java.util.List;
 import ort.da.DAObligatorio.excepciones.PeajeException;
 import ort.da.DAObligatorio.modelo.bonificaciones.Bonificacion;
 import ort.da.DAObligatorio.modelo.estados.Estado;
+import ort.da.DAObligatorio.modelo.estados.EstadoDeshabilitado;
+import ort.da.DAObligatorio.modelo.estados.EstadoSuspendido;
 // import ort.da.DAObligatorio.modelo.bonificaciones.Bonificacion;
 // import ort.da.DAObligatorio.modelo.bonificaciones.ReglaBonificacion;
 // import ort.da.DAObligatorio.modelo.peajes.AsignacionDeBonificacion;
@@ -60,7 +62,7 @@ public class ServicioTransitos {
         //vehiculos
         Vehiculo vehiculo = sVehiculos.buscarVehiculoPorMatricula(matricula);
         if(vehiculo == null) {
-            throw new PeajeException("Vehiculo no encontrado");
+            throw new PeajeException("No existe el vehículo");
         }
 
         //puesto
@@ -77,8 +79,16 @@ public class ServicioTransitos {
 
         //Estado
         Estado estado = propietario.getEstado();
-        if(estado == null || !estado.permiteTransito()){
+        if(estado == null){
             throw new PeajeException("No se permiten transitos.");
+        }
+
+        if(estado instanceof EstadoDeshabilitado){
+            throw new PeajeException("El propietario del vehículo está deshabilitado, no puede realizar tránsitos");
+        }
+
+        if(estado instanceof EstadoSuspendido){
+            throw new PeajeException("El propietario del vehículo está suspendido, no puede realizar tránsitos");
         }
 
         //tarifa
@@ -95,32 +105,36 @@ public class ServicioTransitos {
        // 3) Obtener la bonificación aplicable, si el estado la permite
         List<Transito> transitosDelPropietario = obtenerTransitosPorPropietario(propietario);
 
-        Bonificacion bonif = sBonificaciones.obtenerBonificacionAplicable(
+        Bonificacion bonif = null;
+        // Si el estado del propietario permite bonificaciones, calcularlas
+        if(estado.aplicaBonificaciones()){
+            bonif = sBonificaciones.obtenerBonificacionAplicable(
                 propietario,
                 puesto,
                 vehiculo,
                 fechaHora,
                 transitosDelPropietario
-        );
+            );
 
-        if (bonif != null) {
-            // Usamos el método NUEVO de ServicioBonificaciones
+            if (bonif != null) {
+            
             montoFinal = sBonificaciones.calcularMontoConBonificacion(
-                    bonif,
-                    tarifa,
-                    propietario,
-                    vehiculo,
-                    puesto,
-                    fechaHora
+                bonif,
+                tarifa,
+                propietario,
+                vehiculo,
+                puesto,
+                fechaHora
             );
             bonificacionAplicada = bonif.getNombre();
+            }
         }
 
 
 
         //saldo
         if(propietario.getSaldo() < montoFinal) {
-            throw new PeajeException("Saldo insuficiente para el propietario: " + propietario.getNombreCompleto());
+            throw new PeajeException("Saldo insuficiente: " + Math.round(propietario.getSaldo()));
         }
 
         //debitar
@@ -131,7 +145,10 @@ public class ServicioTransitos {
         agregarTransito(tr);
         
         RegistroResultadoTransito resultado = new RegistroResultadoTransito(propietario,vehiculo,tarifa, montoFinal,bonificacionAplicada);
-        propietario.notificarTransitoRegistrado(resultado);
+       
+        if(estado.permiteNotificaciones()){
+            propietario.notificarTransitoRegistrado(resultado);
+        }
 
 
         return resultado;
